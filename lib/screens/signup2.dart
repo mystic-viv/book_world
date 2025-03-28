@@ -1,20 +1,20 @@
-import 'dart:ui';
+// ignore_for_file: deprecated_member_use
 
+import 'dart:ui';
+import 'package:book_world/screens/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:book_world/screens/signup3.dart';
 
-class Signup2
- extends StatefulWidget {
+class Signup2 extends StatefulWidget {
   const Signup2({super.key});
 
   @override
-  State<StatefulWidget> createState() => _Signup2
-();
+  State<StatefulWidget> createState() => _Signup2();
 }
 
-class _Signup2
- extends State<Signup2
-> {
+class _Signup2 extends State<Signup2> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,179 +23,420 @@ class _Signup2
         width: double.infinity,
         child: Stack(
           children: [
+            // Background with blur effect
             SizedBox.expand(
               child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Image.asset('assets/images/bg-image.png'),
+                imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: Image.asset(
+                  'assets/images/bg-image.png',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            Positioned(
-              top: MediaQuery.of(context).size.height*20/100,
-              width: MediaQuery.of(context).size.width,
-              child: Align(
-                  alignment: Alignment.center,
-                  child: Stack(
+
+            // Dark overlay for better contrast
+            Container(color: Colors.black.withOpacity(0.3)),
+
+            // Main content
+            Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // App logo or title
+                      const Text(
+                        "Book World",
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Join our community of readers",
+                        style: TextStyle(fontSize: 16, color: Colors.white70),
+                      ),
+                      const SizedBox(height: 40),
 
+                      // Signup card
                       Container(
-                        padding: const EdgeInsets.fromLTRB(20, 30, 15, 0),
-                        margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-
-                        height: 450,
-                        width: 300,
-
+                        width: 340,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: const Color(0xFFFDDCBB),
-                            border: Border.all(color: Colors.orange, width: 3)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-
-                          children: [
-
-                            const Text("Date Of Birth",style: TextStyle(fontSize: 15,color:Colors.black,fontWeight:FontWeight.bold), ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 20, 10, 20),
-
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  // Day Input
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 10,spreadRadius: 0.5,offset: Offset(0, 4))]
-                                    ),
-                                    width: 70,
-                                    child: const TextField(
-                                      keyboardType: TextInputType.number,
-                                      maxLength: 2,
-                                      decoration: InputDecoration(
-                                        counterText: "",
-                                        hintText: "DD",
-                                        border: OutlineInputBorder(),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-
-                                  // Month Input
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 10,spreadRadius: 0.5,offset: Offset(0, 4))]
-                                    ),
-                                    width: 70,
-                                    child: const TextField(
-                                      keyboardType: TextInputType.number,
-                                      maxLength: 2,
-                                      decoration: InputDecoration(
-                                        counterText: "",
-                                        hintText: "MM",
-                                        border: OutlineInputBorder(),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-
-                                  // Year Input
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 10,spreadRadius: 0.5,offset: Offset(0, 4))]
-                                    ),
-                                    width: 80,
-                                    child: const TextField(
-                                      keyboardType: TextInputType.number,
-                                      maxLength: 4,
-                                      decoration: InputDecoration(
-                                        counterText: "",
-                                        hintText: "YYYY",
-                                        border: OutlineInputBorder(),
-                                      ),
-                                    ),
-                                  ),
-
-                                ],
-                              ),
+                          color: const Color(0xFFFFECE0),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              spreadRadius: 2,
                             ),
-
-                            const Text("Local Address",style: TextStyle(fontSize: 15,color:Colors.black,fontWeight:FontWeight.bold), ),
-                            Container(
-                              margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                              width: double.infinity,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 10,spreadRadius: 0.5,offset: Offset(0, 4))]
-                              ),
-                              child: const TextField(
-                                keyboardType: TextInputType.multiline,
-                                maxLines: 5,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none
-                                  ),
-                              ),
-                            ),
-                            const SizedBox(height: 20,),
-                            const Text("Permanent Address",style: TextStyle(fontSize: 15,color:Colors.black,fontWeight:FontWeight.bold), ),
-                            Container(
-                              margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                              width: double.infinity,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 10,spreadRadius: 0.5,offset: Offset(0, 4))]
-                              ),
-                              child: const TextField(
-                                keyboardType: TextInputType.multiline,
-                                maxLines: 5,
-                                decoration: InputDecoration(
-                                    border: InputBorder.none
-                                ),
-                              ),
-                            ), const SizedBox(height: 30,),
-                            Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                    width: 110,
-                                    child: const Text("Login",style: TextStyle(fontSize: 19,color: Colors.orange),),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                    height: 30,
-                                    width: 110,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.orange),
-                                    child: InkWell(
-                                      onTap: (){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const Signup3()));
-                                      },
-                                      child: const Text(
-                                        "Next",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.white,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                                ]
-                            )
                           ],
                         ),
-                      ), 
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Center(
+                                  child: Text(
+                                    "Create Account",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                ),
+                                const Center(
+                                  child: Text(
+                                    "Step 2 of 3",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
 
+                                // Date of Birth field
+                                const Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_month_outlined,
+                                      color: Colors.orange,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Date of Birth",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    // Day Input
+                                    Expanded(
+                                      child: TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        maxLength: 2,
+                                        decoration: InputDecoration(
+                                          counterText: "",
+                                          hintText: "DD",
+                                          filled: true,
+                                          fillColor: Colors.grey.shade100,
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Colors.orange,
+                                              width: 2,
+                                            ),
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Required';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+
+                                    // Month Input
+                                    Expanded(
+                                      child: TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        maxLength: 2,
+                                        decoration: InputDecoration(
+                                          counterText: "",
+                                          hintText: "MM",
+                                          filled: true,
+                                          fillColor: Colors.grey.shade100,
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Colors.orange,
+                                              width: 2,
+                                            ),
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Required';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+
+                                    // Year Input
+                                    Expanded(
+                                      flex: 2,
+                                      child: TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        maxLength: 4,
+                                        decoration: InputDecoration(
+                                          counterText: "",
+                                          hintText: "YYYY",
+                                          filled: true,
+                                          fillColor: Colors.grey.shade100,
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Colors.orange,
+                                              width: 2,
+                                            ),
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Required';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+
+                                // Local Address field
+                                const Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.home,
+                                      color: Colors.orange,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Local Address",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  maxLines: 3,
+                                  decoration: InputDecoration(
+                                    hintText:
+                                        "Enter your local address with pincode",
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Colors.orange,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your local address';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+
+                                // Permanent Address field
+                                const Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.location_city,
+                                      color: Colors.orange,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Permanent Address",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  maxLines: 3,
+                                  decoration: InputDecoration(
+                                    hintText:
+                                        "Enter your permanent address with pincode",
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Colors.orange,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your permanent address';
+                                    }
+                                    return null;
+                                  },
+                                ),
+
+                                const SizedBox(height: 30),
+
+                                // Navigation buttons
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Back button
+                                    SizedBox(
+                                      width: 120,
+                                      height: 45,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => const Signup(),
+                                            ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.grey.shade200,
+                                          foregroundColor: Colors.black87,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          elevation: 2,
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Back",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.orange,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                    // Next button
+                                    SizedBox(
+                                      width: 120,
+                                      height: 45,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) =>
+                                                        const Signup3(),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          elevation: 3,
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Next",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
-                  )),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

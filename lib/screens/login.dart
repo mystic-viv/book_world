@@ -1,5 +1,7 @@
-import 'dart:ui';
+// ignore_for_file: deprecated_member_use
 
+import 'dart:ui';
+import 'package:book_world/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:book_world/screens/signup.dart';
 
@@ -11,6 +13,9 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
+  final _formKey = GlobalKey<FormState>();
+  bool _obscurePassword = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,132 +24,250 @@ class _Login extends State<Login> {
         width: double.infinity,
         child: Stack(
           children: [
+            // Background with blur effect
             SizedBox.expand(
               child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Image.asset('assets/images/bg-image.png'),
+                imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: Image.asset(
+                  'assets/images/bg-image.png',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            Positioned(
-            top: MediaQuery.of(context).size.height*20/100,
-            width: MediaQuery.of(context).size.width,
-              child: Align(
-                alignment: Alignment.center,
-                  child: Stack(
-                children: [
 
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(20, 50, 15, 0),
-                    margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+            // Dark overlay for better contrast
+            Container(color: Colors.black.withOpacity(0.3)),
 
-                    height: 400,
-                    width: 300,
-                    
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                        color: const Color(0xFFFDDCBB),
-                        border: Border.all(color: Colors.orange, width: 3)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-
-                      children: [
-
-                        const Text("User Name",style: TextStyle(fontSize: 15,color:Colors.black,fontWeight:FontWeight.bold), ),
-                        Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 10,spreadRadius: 0.5,offset: Offset(0, 4))]
-                          ),
-                          child: const TextField(decoration: InputDecoration(
-                            hintText: "Enter your name", // Placeholder text
-
-                            // Label text
-                            border: OutlineInputBorder(),
-
-                          filled: true,
-                          fillColor: Colors.white)),
+            // Main content
+            Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // App logo or title
+                      const Text(
+                        "Book World",
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.5,
                         ),
-                        const SizedBox(height: 25,),
-                        const Text("Password",style: TextStyle(fontSize: 15,color:Colors.black,fontWeight:FontWeight.bold), ),
-                        Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 5,spreadRadius: 0.5,offset: Offset(0, 4))]
-                          ),
-                          child: const TextField(decoration: InputDecoration(
-                              hintText: "Enter your Password", // Placeholder text
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Your gateway to endless stories",
+                        style: TextStyle(fontSize: 16, color: Colors.white70),
+                      ),
+                      const SizedBox(height: 40),
 
-                              // Label text
-                              border: OutlineInputBorder(),
-
-                              filled: true,
-                              fillColor: Colors.white)),
+                      // Login card
+                      Container(
+                        width: 340,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFECE0),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 5,),
-                        const Text("forgot password ?",style: TextStyle(fontSize: 16,color:Colors.lightBlueAccent), ),
-                        const SizedBox(height: 25,),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Container(
-                            height: 30,
-                            width: 110,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.orange),
-                            child: const Text(
-                              "LOGIN",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.center,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Center(
+                                  child: Text(
+                                    "Welcome Back",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+
+                                // Username field
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: "Enter your username",
+                                    prefixIcon: const Icon(
+                                      Icons.person,
+                                      color: Colors.orange,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Colors.orange,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your username';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+
+                                // Password field
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  obscureText: _obscurePassword,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter your password",
+                                    prefixIcon: const Icon(
+                                      Icons.lock,
+                                      color: Colors.orange,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                        color: Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Colors.orange,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your password';
+                                    }
+                                    return null;
+                                  },
+                                ),
+
+                                // Forgot password
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      // Add forgot password functionality
+                                    },
+                                    child: const Text(
+                                      "Forgot Password?",
+                                      style: TextStyle(
+                                        color: Colors.orange,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 16),
+
+                                // Login button
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => const HomeScreen(),
+                                          ),
+                                          (route) =>
+                                              false, // This removes all previous routes
+                                        );
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      elevation: 3,
+                                    ),
+                                    child: const Text(
+                                      "LOGIN",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                // Sign up option
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      "Don't have an account? ",
+                                      style: TextStyle(color: Colors.black87),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => const Signup(),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text(
+                                        "Sign Up",
+                                        style: TextStyle(
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-
-                        ),const SizedBox(height: 14,),const SizedBox(
-                            width: double.infinity,
-                            child: Text("or sign up using",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 15,color:Colors.black), )),const SizedBox(height: 10,),SizedBox(
-                            width: double.infinity,
-                            child: InkWell(
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>const Signup()));
-                              },
-                              child: const Text("Sign Up",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 18,color:Colors.orange), ),
-                            )),
-
-                      ],
-                    ),
-                  ), Positioned(
-                    left: 45,
-                    child:
-
-                    Container(
-                      height: 50,
-                      width: 210,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.orange),
-                      child: const Text(
-                        "LOGIN",
-                        style: TextStyle(
-                          fontSize: 30,
-                          color: Colors.white,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ),
-
-                  )
-                ],
-              )),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),

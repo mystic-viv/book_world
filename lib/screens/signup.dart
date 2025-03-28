@@ -1,7 +1,8 @@
-import 'dart:ui';
+// ignore_for_file: deprecated_member_use
 
-import 'package:book_world/screens/signup2.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:book_world/screens/signup2.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -11,6 +12,8 @@ class Signup extends StatefulWidget {
 }
 
 class _Signup extends State<Signup> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,148 +22,258 @@ class _Signup extends State<Signup> {
         width: double.infinity,
         child: Stack(
           children: [
+            // Background with blur effect
             SizedBox.expand(
               child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Image.asset('assets/images/bg-image.png'),
+                imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: Image.asset(
+                  'assets/images/bg-image.png',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            Positioned(
-              top: MediaQuery.of(context).size.height*20/100,
-              width: MediaQuery.of(context).size.width,
-              child: Align(
-                  alignment: Alignment.center,
-                  child: Stack(
+
+            // Dark overlay for better contrast
+            Container(color: Colors.black.withOpacity(0.3)),
+
+            // Main content
+            Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // App logo or title
+                      const Text(
+                        "Book World",
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Join our community of readers",
+                        style: TextStyle(fontSize: 16, color: Colors.white70),
+                      ),
+                      const SizedBox(height: 40),
 
+                      // Signup card
                       Container(
-                        padding: const EdgeInsets.fromLTRB(20, 50, 15, 0),
-                        margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-
-                        height: 450,
-                        width: 300,
-
+                        width: 340,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: const Color(0xFFFDDCBB),
-                            border: Border.all(color: Colors.orange, width: 3)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-
-                          children: [
-
-                            const Text("Full Name",style: TextStyle(fontSize: 15,color:Colors.black,fontWeight:FontWeight.bold), ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 10,spreadRadius: 0.5,offset: Offset(0, 4))]
-                              ),
-                              child: const TextField(decoration: InputDecoration(
-                                  hintText: "Enter your name", // Placeholder text
-
-                                  // Label text
-                                  border: OutlineInputBorder(),
-
-                                  filled: true,
-                                  fillColor: Colors.white)),
+                          color: const Color(0xFFFFECE0),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              spreadRadius: 2,
                             ),
-                            const SizedBox(height: 25,),
-                            const Text("User Name",style: TextStyle(fontSize: 15,color:Colors.black,fontWeight:FontWeight.bold), ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 5,spreadRadius: 0.5,offset: Offset(0, 4))]
-                              ),
-                              child: const TextField(decoration: InputDecoration(
-                                  hintText: "Enter your Password", // Placeholder text
-
-                                  // Label text
-                                  border: OutlineInputBorder(),
-
-                                  filled: true,
-                                  fillColor: Colors.white)),
-                            ),
-                            const SizedBox(height: 5,),
-                            const Text("Contains alphabets, numbers, hyphen and underscore",style: TextStyle(fontSize: 16,color:Colors.black), ),
-                            const SizedBox(height: 15,),
-                            const Text("Mobile Number",style: TextStyle(fontSize: 15,color:Colors.black,fontWeight:FontWeight.bold), ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: const [BoxShadow(color: Colors.grey,blurRadius: 10,spreadRadius: 0.5,offset: Offset(0, 4))]
-                              ),
-                              child: const TextField(decoration: InputDecoration(
-                                  hintText: "Enter your mobile number", // Placeholder text
-
-                                  // Label text
-                                  border: OutlineInputBorder(),
-
-                                  filled: true,
-                                  fillColor: Colors.white)),
-                            ),
-                            const SizedBox(height: 25,),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                  width: 110,
-                                  child: const Text("Login",style: TextStyle(fontSize: 19,color: Colors.orange),),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                height: 30,
-                                width: 110,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.orange),
-                                child: InkWell(
-                                  onTap: (){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>const Signup2()));
-                                  },
-                                  child: const Text(
-                                    "Next",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-]
-                            )
-
                           ],
                         ),
-                      ), Positioned(
-                        left: 45,
-                        child:
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Center(
+                                  child: Text(
+                                    "Create Account",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
 
-                        Container(
-                          height: 50,
-                          width: 210,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.orange),
-                          child: const Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              fontSize: 30,
-                              color: Colors.white,
+                                // Full Name field
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: "Enter your full name",
+                                    prefixIcon: const Icon(
+                                      Icons.person,
+                                      color: Colors.orange,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Colors.orange,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your full name';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+
+                                // Username field
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: "Create a username",
+                                    prefixIcon: const Icon(
+                                      Icons.alternate_email,
+                                      color: Colors.orange,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Colors.orange,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please create a username';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 5),
+                                const Text(
+                                  "Contains alphabets, numbers, hyphen and underscore",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+
+                                // Mobile Number field
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter your mobile number",
+                                    prefixIcon: const Icon(
+                                      Icons.phone_android,
+                                      color: Colors.orange,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Colors.orange,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your mobile number';
+                                    }
+                                    return null;
+                                  },
+                                ),
+
+                                const SizedBox(height: 30),
+
+                                // Navigation buttons
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Back to Login button
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text(
+                                        "Login",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+
+                                    // Next button
+                                    SizedBox(
+                                      width: 120,
+                                      height: 45,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) =>
+                                                        const Signup2(),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          elevation: 3,
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Next",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
-
-                      )
+                      ),
                     ],
-                  )),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
