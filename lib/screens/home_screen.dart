@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:book_world/screens/saved_books_screen.dart';
+import 'package:book_world/screens/borrowed_books_screen.dart';
+import 'package:book_world/screens/account_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -45,8 +48,38 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        onTap: (index) {
+          switch (index) {
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SavedBooksScreen(),
+                ),
+              );
+              break;
+            case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BorrowedBooksScreen(),
+                ),
+              );
+              break;
+            case 3:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AccountScreen()),
+              );
+              break;
+          }
+        },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded),
+            label: 'Home',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'Saved'),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Borrowed'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
@@ -99,7 +132,11 @@ class HomeScreen extends StatelessWidget {
           children: [
             const Text(
               'Genres',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orange),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange,
+              ),
             ),
             TextButton(
               onPressed: () {},
@@ -110,20 +147,20 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
-       Center(
-        child: Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            _genreItem('Biographies', Icons.contact_page),
-            // _genreItem('Sci-Fiction', Icons.auto_stories),
-            _genreItem('Literature', Icons.feed),
-            _genreItem('Engineering', Icons.engineering),
-            _genreItem('History', Icons.history_edu),
-            _genreItem('Law', Icons.gavel),
-          ],
+        Center(
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              _genreItem('Biographies', Icons.contact_page),
+              // _genreItem('Sci-Fiction', Icons.auto_stories),
+              _genreItem('Literature', Icons.feed),
+              _genreItem('Engineering', Icons.engineering),
+              _genreItem('History', Icons.history_edu),
+              _genreItem('Law', Icons.gavel),
+            ],
+          ),
         ),
-       ),
       ],
     );
   }
@@ -138,7 +175,7 @@ class HomeScreen extends StatelessWidget {
             border: Border.all(color: Colors.orange),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: Colors.orange, size: 30,),
+          child: Icon(icon, color: Colors.orange, size: 30),
         ),
         const SizedBox(height: 4),
         Text(title, style: const TextStyle(fontSize: 10)),
@@ -173,7 +210,10 @@ class HomeScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Teens', style: TextStyle(fontSize: 18, color: Colors.green)),
+            child: const Text(
+              'Teens',
+              style: TextStyle(fontSize: 18, color: Colors.green),
+            ),
           ),
         ),
       ],
@@ -189,7 +229,11 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orange),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange,
+              ),
             ),
             TextButton(
               onPressed: () {},

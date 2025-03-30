@@ -16,9 +16,11 @@ class _Splash extends State<Splash> {
   void initState() {
     Future.delayed(const Duration(seconds: 4), () {
       // ignore: use_build_context_synchronously
-      Navigator.of(
+      Navigator.pushAndRemoveUntil(
         context,
-      ).push(MaterialPageRoute(builder: (context) => const Login()));
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false,
+      );
     });
 
     super.initState();
