@@ -1,18 +1,35 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:ui';
+import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/screens/auth/login.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/signup2.dart';
+import 'package:get/route_manager.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class Signup3 extends StatefulWidget {
+  const Signup3({super.key});
 
   @override
-  State<StatefulWidget> createState() => _Signup();
+  State<StatefulWidget> createState() => _Signup3();
 }
 
-class _Signup extends State<Signup> {
+class _Signup3 extends State<Signup3> {
   final _formKey = GlobalKey<FormState>();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  // Add controllers for the password fields
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controllers when the widget is disposed
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +82,9 @@ class _Signup extends State<Signup> {
                       Container(
                         width: 340,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFECE0),
+                          color: const Color(
+                            0xFFFFECE0,
+                          ) /* Light orange color */, // Change the color here
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -92,15 +111,24 @@ class _Signup extends State<Signup> {
                                     ),
                                   ),
                                 ),
+                                const Center(
+                                  child: Text(
+                                    "Step 3 of 3",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
                                 const SizedBox(height: 24),
 
-                                // Full Name field
-                                const SizedBox(height: 8),
+                                // Email field
                                 TextFormField(
+                                  keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
-                                    hintText: "Enter your full name",
+                                    hintText: "Enter your email address",
                                     prefixIcon: const Icon(
-                                      Icons.person,
+                                      Icons.email,
                                       color: Colors.orange,
                                     ),
                                     filled: true,
@@ -119,21 +147,40 @@ class _Signup extends State<Signup> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your full name';
+                                      return 'Please enter your email';
+                                    }
+                                    if (!RegExp(
+                                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                    ).hasMatch(value)) {
+                                      return 'Please enter a valid email address';
                                     }
                                     return null;
                                   },
                                 ),
                                 const SizedBox(height: 20),
 
-                                // Username field
-                                const SizedBox(height: 8),
+                                // Password field
                                 TextFormField(
+                                  controller: _passwordController,
+                                  obscureText: _obscurePassword,
                                   decoration: InputDecoration(
-                                    hintText: "Create a username",
+                                    hintText: "Create a password",
                                     prefixIcon: const Icon(
-                                      Icons.alternate_email,
+                                      Icons.lock,
                                       color: Colors.orange,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                        color: Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
                                     ),
                                     filled: true,
                                     fillColor: Colors.grey.shade100,
@@ -151,30 +198,39 @@ class _Signup extends State<Signup> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please create a username';
+                                      return 'Please create a password';
+                                    }
+                                    if (value.length < 6) {
+                                      return 'Password must be at least 6 characters';
                                     }
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 5),
-                                const Text(
-                                  "Contains alphabets, numbers, hyphen and underscore",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
                                 const SizedBox(height: 20),
 
-                                // Mobile Number field
-                                const SizedBox(height: 8),
+                                // Confirm Password field
                                 TextFormField(
-                                  keyboardType: TextInputType.phone,
+                                  controller: _confirmPasswordController,
+                                  obscureText: _obscureConfirmPassword,
                                   decoration: InputDecoration(
-                                    hintText: "Enter your mobile number",
+                                    hintText: "Confirm password",
                                     prefixIcon: const Icon(
-                                      Icons.phone_android,
+                                      Icons.lock_outline,
                                       color: Colors.orange,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscureConfirmPassword
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                        color: Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscureConfirmPassword =
+                                              !_obscureConfirmPassword;
+                                        });
+                                      },
                                     ),
                                     filled: true,
                                     fillColor: Colors.grey.shade100,
@@ -192,7 +248,10 @@ class _Signup extends State<Signup> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your mobile number';
+                                      return 'Please confirm your password';
+                                    }
+                                    if (value != _passwordController.text) {
+                                      return 'Passwords do not match';
                                     }
                                     return null;
                                   },
@@ -205,22 +264,42 @@ class _Signup extends State<Signup> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    // Back to Login button
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text(
-                                        "Login",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.orange,
-                                          fontWeight: FontWeight.w600,
+                                    // Back button
+                                    SizedBox(
+                                      width: 120,
+                                      height: 45,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          Get.back();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.grey.shade200,
+                                          foregroundColor: Colors.black87,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          elevation: 2,
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Back",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.orange,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
 
-                                    // Next button
+                                    // Verify button
                                     SizedBox(
                                       width: 120,
                                       height: 45,
@@ -228,14 +307,18 @@ class _Signup extends State<Signup> {
                                         onPressed: () {
                                           if (_formKey.currentState!
                                               .validate()) {
-                                            Navigator.push(
+                                            // Implement verification logic
+                                            ScaffoldMessenger.of(
                                               context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (context) =>
-                                                        const Signup2(),
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Account created successfully!',
+                                                ),
+                                                backgroundColor: Colors.green,
                                               ),
                                             );
+                                            Get.toNamed(RouteNames.login);
                                           }
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -253,9 +336,9 @@ class _Signup extends State<Signup> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              "Next",
+                                              "Verify",
                                               style: TextStyle(
-                                                fontSize: 20,
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),

@@ -1,9 +1,9 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:ui';
-import 'package:book_world/screens/signup.dart';
+import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/screens/auth/signup1.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/signup3.dart';
+import 'package:book_world/screens/auth/signup3.dart';
+import 'package:get/route_manager.dart';
 
 class Signup2 extends StatefulWidget {
   const Signup2({super.key});
@@ -13,6 +13,8 @@ class Signup2 extends StatefulWidget {
 }
 
 class _Signup2 extends State<Signup2> {
+  // TextEditingController for date picker
+  final TextEditingController datePicker = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -34,7 +36,6 @@ class _Signup2 extends State<Signup2> {
               ),
             ),
 
-            // Dark overlay for better contrast
             Container(color: Colors.black.withOpacity(0.3)),
 
             // Main content
@@ -125,21 +126,26 @@ class _Signup2 extends State<Signup2> {
                                   ],
                                 ),
                                 const SizedBox(height: 8),
+
+                                // Date Input
+                                // Replace the problematic Row with this:
                                 Row(
                                   children: [
-                                    // Day Input
                                     Expanded(
+                                      // Wrap with Expanded to give it a size constraint
                                       child: TextFormField(
-                                        keyboardType: TextInputType.number,
-                                        maxLength: 2,
+                                        controller: datePicker,
                                         decoration: InputDecoration(
-                                          counterText: "",
-                                          hintText: "DD",
+                                          hintText:
+                                              "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
                                           filled: true,
                                           fillColor: Colors.grey.shade100,
+                                          hintStyle: TextStyle(
+                                            color: Colors.grey,
+                                          ),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(12),
                                             ),
                                             borderSide: BorderSide.none,
                                           ),
@@ -153,89 +159,50 @@ class _Signup2 extends State<Signup2> {
                                             ),
                                           ),
                                         ),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Required';
-                                          }
-                                          return null;
-                                        },
                                       ),
                                     ),
                                     const SizedBox(width: 10),
-
-                                    // Month Input
-                                    Expanded(
-                                      child: TextFormField(
-                                        keyboardType: TextInputType.number,
-                                        maxLength: 2,
-                                        decoration: InputDecoration(
-                                          counterText: "",
-                                          hintText: "MM",
-                                          filled: true,
-                                          fillColor: Colors.grey.shade100,
-                                          border: OutlineInputBorder(
+                                    // Date Picker Button
+                                    SizedBox(
+                                      height: 54,
+                                      width: 54,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
-                                            borderSide: BorderSide.none,
                                           ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            borderSide: const BorderSide(
-                                              color: Colors.orange,
-                                              width: 2,
-                                            ),
-                                          ),
+                                          padding:
+                                              EdgeInsets
+                                                  .zero, // Remove default padding
                                         ),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Required';
+                                        onPressed: () async {
+                                          final selectedDate =
+                                              await showDatePicker(
+                                                context: context,
+                                                initialDate: DateTime.now(),
+                                                firstDate: DateTime(1900),
+                                                lastDate: DateTime.now(),
+                                              );
+                                          if (selectedDate != null) {
+                                            setState(() {
+                                              datePicker.text =
+                                                  "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+                                            });
                                           }
-                                          return null;
                                         },
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-
-                                    // Year Input
-                                    Expanded(
-                                      flex: 2,
-                                      child: TextFormField(
-                                        keyboardType: TextInputType.number,
-                                        maxLength: 4,
-                                        decoration: InputDecoration(
-                                          counterText: "",
-                                          hintText: "YYYY",
-                                          filled: true,
-                                          fillColor: Colors.grey.shade100,
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            borderSide: BorderSide.none,
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            borderSide: const BorderSide(
-                                              color: Colors.orange,
-                                              width: 2,
-                                            ),
-                                          ),
+                                        child: const Icon(
+                                          Icons.calendar_month_outlined,
+                                          size: 30,
+                                          color: Colors.white,
                                         ),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Required';
-                                          }
-                                          return null;
-                                        },
                                       ),
                                     ),
                                   ],
                                 ),
+
                                 const SizedBox(height: 20),
 
                                 // Local Address field
@@ -262,8 +229,7 @@ class _Signup2 extends State<Signup2> {
                                 TextFormField(
                                   maxLines: 3,
                                   decoration: InputDecoration(
-                                    hintText:
-                                        "Enter your local address with pincode",
+                                    hintText: "Enter your local address",
                                     filled: true,
                                     fillColor: Colors.grey.shade100,
                                     border: OutlineInputBorder(
@@ -285,6 +251,51 @@ class _Signup2 extends State<Signup2> {
                                     return null;
                                   },
                                 ),
+                                const SizedBox(height: 20),
+                                /* Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Pincode",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    TextFormField(
+                                      maxLength: 6,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        hintText: "Enter your pincode",
+                                        filled: true,
+                                        fillColor: Colors.grey.shade100,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          borderSide: const BorderSide(
+                                            color: Colors.orange,
+                                            width: 2,
+                                          ),
+                                        ),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter your pincode';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ],
+                                ), */
                                 const SizedBox(height: 20),
 
                                 // Permanent Address field
@@ -311,8 +322,7 @@ class _Signup2 extends State<Signup2> {
                                 TextFormField(
                                   maxLines: 3,
                                   decoration: InputDecoration(
-                                    hintText:
-                                        "Enter your permanent address with pincode",
+                                    hintText: "Enter your permanent address",
                                     filled: true,
                                     fillColor: Colors.grey.shade100,
                                     border: OutlineInputBorder(
@@ -347,15 +357,7 @@ class _Signup2 extends State<Signup2> {
                                       width: 120,
                                       height: 45,
                                       child: ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (context) => const Signup(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => Get.back(),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.grey.shade200,
                                           foregroundColor: Colors.black87,
@@ -391,14 +393,7 @@ class _Signup2 extends State<Signup2> {
                                         onPressed: () {
                                           if (_formKey.currentState!
                                               .validate()) {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (context) =>
-                                                        const Signup3(),
-                                              ),
-                                            );
+                                            Get.toNamed(RouteNames.signup3);
                                           }
                                         },
                                         style: ElevatedButton.styleFrom(

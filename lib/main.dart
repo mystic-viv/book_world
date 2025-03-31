@@ -1,4 +1,8 @@
+import 'package:book_world/routes/route.dart';
+import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'screens/home_screen.dart';
 import 'screens/saved_books_screen.dart';
 import 'screens/borrowed_books_screen.dart';
@@ -14,16 +18,13 @@ class BookWorldApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Book World',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.orange,
-        scaffoldBackgroundColor: const Color(0xFFFFE8C6),
-        fontFamily: 'Sanchez',
-      ),
-
-      home: const Splash(),
+      theme: theme,
+      getPages: Routes.pages,
+      initialRoute: RouteNames.splash,
+      defaultTransition: Transition.noTransition,
     );
   }
 }

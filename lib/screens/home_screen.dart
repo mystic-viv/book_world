@@ -28,6 +28,7 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
       ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

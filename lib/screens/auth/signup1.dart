@@ -1,33 +1,20 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:ui';
-import 'package:book_world/screens/login.dart';
+import 'package:book_world/routes/route_names.dart';
 import 'package:flutter/material.dart';
+import 'package:book_world/screens/auth/signup2.dart';
+import 'package:get/route_manager.dart';
 
-class Signup3 extends StatefulWidget {
-  const Signup3({super.key});
+class Signup1 extends StatefulWidget {
+  const Signup1({super.key});
 
   @override
-  State<StatefulWidget> createState() => _Signup3();
+  State<StatefulWidget> createState() => _Signup();
 }
 
-class _Signup3 extends State<Signup3> {
+class _Signup extends State<Signup1> {
   final _formKey = GlobalKey<FormState>();
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
-
-  // Add controllers for the password fields
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
-  @override
-  void dispose() {
-    // Clean up the controllers when the widget is disposed
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,9 +67,7 @@ class _Signup3 extends State<Signup3> {
                       Container(
                         width: 340,
                         decoration: BoxDecoration(
-                          color: const Color(
-                            0xFFFFECE0,
-                          ) /* Light orange color */, // Change the color here
+                          color: const Color(0xFFFFECE0),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -109,24 +94,25 @@ class _Signup3 extends State<Signup3> {
                                     ),
                                   ),
                                 ),
+
                                 const Center(
                                   child: Text(
-                                    "Step 3 of 3",
+                                    "Step 1 of 3",
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,
                                     ),
                                   ),
                                 ),
+
                                 const SizedBox(height: 24),
-
-                                // Email field
+                                // Full Name field
+                                const SizedBox(height: 8),
                                 TextFormField(
-                                  keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
-                                    hintText: "Enter your email address",
+                                    hintText: "Enter your full name",
                                     prefixIcon: const Icon(
-                                      Icons.email,
+                                      Icons.person,
                                       color: Colors.orange,
                                     ),
                                     filled: true,
@@ -145,40 +131,21 @@ class _Signup3 extends State<Signup3> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your email';
-                                    }
-                                    if (!RegExp(
-                                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                                    ).hasMatch(value)) {
-                                      return 'Please enter a valid email address';
+                                      return 'Please enter your full name';
                                     }
                                     return null;
                                   },
                                 ),
                                 const SizedBox(height: 20),
 
-                                // Password field
+                                // Username field
+                                const SizedBox(height: 8),
                                 TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: _obscurePassword,
                                   decoration: InputDecoration(
-                                    hintText: "Create a password",
+                                    hintText: "Create a username",
                                     prefixIcon: const Icon(
-                                      Icons.lock,
+                                      Icons.alternate_email,
                                       color: Colors.orange,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscurePassword
-                                            ? Icons.visibility_off
-                                            : Icons.visibility,
-                                        color: Colors.grey,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscurePassword = !_obscurePassword;
-                                        });
-                                      },
                                     ),
                                     filled: true,
                                     fillColor: Colors.grey.shade100,
@@ -196,39 +163,30 @@ class _Signup3 extends State<Signup3> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please create a password';
-                                    }
-                                    if (value.length < 6) {
-                                      return 'Password must be at least 6 characters';
+                                      return 'Please create a username';
                                     }
                                     return null;
                                   },
                                 ),
+                                const SizedBox(height: 5),
+                                const Text(
+                                  "Contains alphabets, numbers, hyphen and underscore",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                                 const SizedBox(height: 20),
 
-                                // Confirm Password field
+                                // Mobile Number field
+                                const SizedBox(height: 8),
                                 TextFormField(
-                                  controller: _confirmPasswordController,
-                                  obscureText: _obscureConfirmPassword,
+                                  keyboardType: TextInputType.phone,
                                   decoration: InputDecoration(
-                                    hintText: "Confirm password",
+                                    hintText: "Enter your mobile number",
                                     prefixIcon: const Icon(
-                                      Icons.lock_outline,
+                                      Icons.phone_android,
                                       color: Colors.orange,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscureConfirmPassword
-                                            ? Icons.visibility_off
-                                            : Icons.visibility,
-                                        color: Colors.grey,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscureConfirmPassword =
-                                              !_obscureConfirmPassword;
-                                        });
-                                      },
                                     ),
                                     filled: true,
                                     fillColor: Colors.grey.shade100,
@@ -246,10 +204,7 @@ class _Signup3 extends State<Signup3> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please confirm your password';
-                                    }
-                                    if (value != _passwordController.text) {
-                                      return 'Passwords do not match';
+                                      return 'Please enter your mobile number';
                                     }
                                     return null;
                                   },
@@ -262,42 +217,21 @@ class _Signup3 extends State<Signup3> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    // Back button
-                                    SizedBox(
-                                      width: 120,
-                                      height: 45,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.grey.shade200,
-                                          foregroundColor: Colors.black87,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          elevation: 2,
-                                        ),
-                                        child: const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Back",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.orange,
-                                              ),
-                                            ),
-                                          ],
+                                    // Back to Login button
+                                    TextButton(
+                                      onPressed:
+                                          () => Get.toNamed(RouteNames.login),
+                                      child: const Text(
+                                        "Login",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
 
-                                    // Verify button
+                                    // Next button
                                     SizedBox(
                                       width: 120,
                                       height: 45,
@@ -305,24 +239,7 @@ class _Signup3 extends State<Signup3> {
                                         onPressed: () {
                                           if (_formKey.currentState!
                                               .validate()) {
-                                            // Implement verification logic
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  'Account created successfully!',
-                                                ),
-                                                backgroundColor: Colors.green,
-                                              ),
-                                            );
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (context) => const Login(),
-                                              ),
-                                            );
+                                            Get.toNamed(RouteNames.signup2);
                                           }
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -340,9 +257,9 @@ class _Signup3 extends State<Signup3> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              "Verify",
+                                              "Next",
                                               style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 20,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),

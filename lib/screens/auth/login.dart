@@ -1,11 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:ui';
+import 'package:book_world/routes/route_names.dart';
 import 'package:book_world/screens/borrowed_books_screen.dart';
 import 'package:book_world/screens/home_screen.dart';
 import 'package:book_world/screens/saved_books_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/signup.dart';
+import 'package:book_world/screens/auth/signup1.dart';
+import 'package:get/route_manager.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -242,15 +244,8 @@ class _Login extends State<Login> {
                                       style: TextStyle(color: Colors.black87),
                                     ),
                                     GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => const Signup(),
-                                          ),
-                                        );
-                                      },
+                                      onTap:
+                                          () => Get.toNamed(RouteNames.signup1),
                                       child: const Text(
                                         "Sign Up",
                                         style: TextStyle(
