@@ -1,15 +1,19 @@
 import 'package:book_world/routes/route.dart';
 import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/screens/Users/account_screen.dart';
+import 'package:book_world/screens/Users/borrowed_books_screen.dart';
+import 'package:book_world/screens/Users/home_screen.dart';
+import 'package:book_world/screens/Users/saved_books_screen.dart';
 import 'package:book_world/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'screens/home_screen.dart';
-import 'screens/saved_books_screen.dart';
-import 'screens/borrowed_books_screen.dart';
-import 'screens/account_screen.dart';
-import 'screens/splash.dart';
+import 'package:get_storage/get_storage.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  await GetStorage.init();
   runApp(const BookWorldApp());
 }
 

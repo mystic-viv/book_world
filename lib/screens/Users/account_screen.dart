@@ -1,7 +1,8 @@
+import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/screens/Users/borrowed_books_screen.dart';
+import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/home_screen.dart';
-import 'package:book_world/screens/saved_books_screen.dart';
-import 'package:book_world/screens/borrowed_books_screen.dart';
+import 'package:get/route_manager.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -30,11 +31,10 @@ class AccountScreen extends StatelessWidget {
         title: Text(title, style: const TextStyle(fontSize: 16)),
         trailing: const Icon(Icons.chevron_right, color: Colors.orange),
         onTap: () {
-          if (screen != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => screen),
-            );
+          if (title == 'Log Out') {
+            Get.offAllNamed(RouteNames.login);
+          } else if (screen != null) {
+            Get.to(() => screen); // Navigate to the screen directly
           }
         },
       ),
@@ -141,6 +141,18 @@ class AccountScreen extends StatelessWidget {
                     null,
                   ),
                   _buildMenuItem(context, 'Log Out', Icons.logout, null),
+                  /* ListTile(
+                    leading: const Icon(Icons.logout, color: Colors.orange),
+                    title: const Text(
+                      'Log Out',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    trailing: const Icon(
+                      Icons.chevron_right,
+                      color: Colors.orange,
+                    ),
+                  ),
+                  */
                 ],
               ),
             ),
@@ -152,27 +164,14 @@ class AccountScreen extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false, // This removes all previous routes
-              );
+              // Navigate to HomeScreen and remove all previous routes using Get
+              Get.offAll(() => const HomeScreen());
               break;
             case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SavedBooksScreen(),
-                ),
-              );
+              Get.toNamed(RouteNames.savedBooks);
               break;
             case 2:
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const BorrowedBooksScreen(),
-                ),
-              );
+              Get.toNamed(RouteNames.borrowedBooks);
               break;
           }
         },

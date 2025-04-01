@@ -3,6 +3,7 @@
 import 'dart:ui';
 import 'package:book_world/routes/route_names.dart';
 import 'package:book_world/screens/auth/login.dart';
+import 'package:book_world/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 
@@ -308,15 +309,10 @@ class _Signup3 extends State<Signup3> {
                                           if (_formKey.currentState!
                                               .validate()) {
                                             // Implement verification logic
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  'Account created successfully!',
-                                                ),
-                                                backgroundColor: Colors.green,
-                                              ),
+
+                                            showSnackBar(
+                                              "Success",
+                                              "Account created successfully!",
                                             );
                                             Get.toNamed(RouteNames.login);
                                           }

@@ -1,7 +1,7 @@
+import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/home_screen.dart';
-import 'package:book_world/screens/saved_books_screen.dart';
-import 'package:book_world/screens/account_screen.dart';
+import 'package:get/route_manager.dart';
 
 class BorrowedBooksScreen extends StatelessWidget {
   const BorrowedBooksScreen({super.key});
@@ -208,25 +208,14 @@ class BorrowedBooksScreen extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false, // This removes all previous routes
-              );
+              // Navigate to HomeScreen and remove all previous routes using Get
+              Get.offAll(() => const HomeScreen());
               break;
             case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SavedBooksScreen(),
-                ),
-              );
+              Get.toNamed(RouteNames.savedBooks);
               break;
             case 3:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AccountScreen()),
-              );
+              Get.toNamed(RouteNames.account);
               break;
           }
         },

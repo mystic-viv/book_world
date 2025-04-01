@@ -2,12 +2,11 @@
 
 import 'dart:ui';
 import 'package:book_world/routes/route_names.dart';
-import 'package:book_world/screens/borrowed_books_screen.dart';
-import 'package:book_world/screens/home_screen.dart';
-import 'package:book_world/screens/saved_books_screen.dart';
+import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:book_world/screens/auth/signup1.dart';
 import 'package:get/route_manager.dart';
+import 'package:book_world/utils/helper.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -104,7 +103,7 @@ class _Login extends State<Login> {
                                 const SizedBox(height: 8),
                                 TextFormField(
                                   decoration: InputDecoration(
-                                    hintText: "Enter your username",
+                                    hintText: "Enter username or Email",
                                     prefixIcon: const Icon(
                                       Icons.person,
                                       color: Colors.orange,
@@ -125,7 +124,7 @@ class _Login extends State<Login> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your username';
+                                      return 'Please enter your username or email address';
                                     }
                                     return null;
                                   },
@@ -203,15 +202,12 @@ class _Login extends State<Login> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       if (_formKey.currentState!.validate()) {
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => const HomeScreen(),
-                                          ),
-                                          (route) =>
-                                              false, // This removes all previous routes
+                                        showSnackBar(
+                                          "Success",
+                                          "Logged in successfully!",
                                         );
+                                        // Navigate to HomeScreen and remove all previous routes using Get
+                                        Get.offAll(() => const HomeScreen());
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(

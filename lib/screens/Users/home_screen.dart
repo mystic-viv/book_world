@@ -1,7 +1,6 @@
+import 'package:book_world/routes/route_names.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/saved_books_screen.dart';
-import 'package:book_world/screens/borrowed_books_screen.dart';
-import 'package:book_world/screens/account_screen.dart';
+import 'package:get/route_manager.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -53,26 +52,13 @@ class HomeScreen extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SavedBooksScreen(),
-                ),
-              );
+              Get.toNamed(RouteNames.savedBooks);
               break;
             case 2:
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const BorrowedBooksScreen(),
-                ),
-              );
+              Get.toNamed(RouteNames.borrowedBooks);
               break;
             case 3:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AccountScreen()),
-              );
+              Get.toNamed(RouteNames.account);
               break;
           }
         },
