@@ -1,7 +1,6 @@
 import 'package:book_world/routes/route_names.dart';
-import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 
 class SavedBooksScreen extends StatelessWidget {
   const SavedBooksScreen({super.key});
@@ -65,8 +64,7 @@ class SavedBooksScreen extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              // Navigate to HomeScreen and remove all previous routes using Get
-              Get.offAll(() => const HomeScreen());
+              Get.offAllNamed(RouteNames.home);
               break;
             case 2:
               Get.toNamed(RouteNames.borrowedBooks);
@@ -77,10 +75,7 @@ class SavedBooksScreen extends StatelessWidget {
           }
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'Saved'),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Borrowed'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),

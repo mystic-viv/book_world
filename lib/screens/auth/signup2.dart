@@ -1,9 +1,8 @@
 import 'dart:ui';
+import 'package:book_world/controllers/auth_controller.dart';
 import 'package:book_world/routes/route_names.dart';
-import 'package:book_world/screens/auth/signup1.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/auth/signup3.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 
 class Signup2 extends StatefulWidget {
   const Signup2({super.key});
@@ -13,6 +12,7 @@ class Signup2 extends StatefulWidget {
 }
 
 class _Signup2 extends State<Signup2> {
+  final AuthController signupController = Get.put(AuthController());
   // TextEditingController for date picker
   final TextEditingController datePicker = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -36,7 +36,7 @@ class _Signup2 extends State<Signup2> {
               ),
             ),
 
-            Container(color: Colors.black.withOpacity(0.3)),
+            Container(color: Colors.black.withAlpha(64)),
 
             // Main content
             Center(
@@ -71,7 +71,7 @@ class _Signup2 extends State<Signup2> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withAlpha(64),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -134,6 +134,11 @@ class _Signup2 extends State<Signup2> {
                                     Expanded(
                                       // Wrap with Expanded to give it a size constraint
                                       child: TextFormField(
+                                        onChanged:
+                                            (value) =>
+                                                signupController.dateOfBirth(
+                                                  value as DateTime?,
+                                                ),
                                         controller: datePicker,
                                         decoration: InputDecoration(
                                           hintText:
@@ -227,6 +232,10 @@ class _Signup2 extends State<Signup2> {
                                 ),
                                 const SizedBox(height: 8),
                                 TextFormField(
+                                  onChanged:
+                                      (value) =>
+                                          signupController.localAddress.value =
+                                              value,
                                   maxLines: 3,
                                   decoration: InputDecoration(
                                     hintText: "Enter your local address",
@@ -320,6 +329,11 @@ class _Signup2 extends State<Signup2> {
                                 ),
                                 const SizedBox(height: 8),
                                 TextFormField(
+                                  onChanged:
+                                      (value) =>
+                                          signupController
+                                              .permanentAddress
+                                              .value = value,
                                   maxLines: 3,
                                   decoration: InputDecoration(
                                     hintText: "Enter your permanent address",

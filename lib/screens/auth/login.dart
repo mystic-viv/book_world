@@ -1,12 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:ui';
+import 'package:book_world/controllers/auth_controller.dart';
 import 'package:book_world/routes/route_names.dart';
-import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/auth/signup1.dart';
-import 'package:get/route_manager.dart';
-import 'package:book_world/utils/helper.dart';
+import 'package:get/get.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -17,6 +15,9 @@ class Login extends StatefulWidget {
 
 class _Login extends State<Login> {
   final _formKey = GlobalKey<FormState>();
+  final _authController = Get.put(AuthController());
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -102,6 +103,7 @@ class _Login extends State<Login> {
                                 // Username field
                                 const SizedBox(height: 8),
                                 TextFormField(
+                                  controller: _usernameController,
                                   decoration: InputDecoration(
                                     hintText: "Enter username or Email",
                                     prefixIcon: const Icon(
@@ -126,6 +128,14 @@ class _Login extends State<Login> {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter your username or email address';
                                     }
+                                    if (!RegExp(
+                                          r'^[a-zA-Z_][a-zA-Z0-9._-]*$',
+                                        ).hasMatch(value) &&
+                                        !RegExp(
+                                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                        ).hasMatch(value)) {
+                                      return 'Invalid username or email address';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -134,6 +144,7 @@ class _Login extends State<Login> {
                                 // Password field
                                 const SizedBox(height: 8),
                                 TextFormField(
+                                  controller: _passwordController,
                                   obscureText: _obscurePassword,
                                   decoration: InputDecoration(
                                     hintText: "Enter your password",
@@ -196,35 +207,46 @@ class _Login extends State<Login> {
                                 const SizedBox(height: 16),
 
                                 // Login button
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 50,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        showSnackBar(
-                                          "Success",
-                                          "Logged in successfully!",
-                                        );
-                                        // Navigate to HomeScreen and remove all previous routes using Get
-                                        Get.offAll(() => const HomeScreen());
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                Obx(
+                                  () => SizedBox(
+                                    width: double.infinity,
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      onPressed:
+                                          _authController.loginLoading.value
+                                              ? null
+                                              : () {
+                                                if (_formKey.currentState!
+                                                    .validate()) {
+                                                  _authController.login(
+                                                    _usernameController.text,
+                                                    _passwordController.text,
+                                                  );
+                                                }
+                                              },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orange,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        elevation: 3,
                                       ),
-                                      elevation: 3,
-                                    ),
-                                    child: const Text(
-                                      "LOGIN",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.2,
-                                      ),
+                                      child:
+                                          _authController.loginLoading.value
+                                              ? const CircularProgressIndicator(
+                                                color: Colors.white,
+                                              )
+                                              : const Text(
+                                                "LOGIN",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 1.2,
+                                                ),
+                                              ),
                                     ),
                                   ),
                                 ),

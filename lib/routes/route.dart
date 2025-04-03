@@ -13,7 +13,7 @@ import 'package:get/route_manager.dart';
 
 class Routes {
   static final pages = [
-    GetPage(name: RouteNames.splash, page: () => const Splash()),
+    GetPage(name: RouteNames.splash, page: () => Splash()),
     GetPage(name: RouteNames.login, page: () => const Login()),
     GetPage(name: RouteNames.signup1, page: () => const Signup1()),
     GetPage(name: RouteNames.signup2, page: () => const Signup2()),

@@ -1,11 +1,7 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:ui';
-import 'package:book_world/routes/route_names.dart';
-import 'package:book_world/screens/auth/login.dart';
-import 'package:book_world/utils/helper.dart';
+import 'package:book_world/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 
 class Signup3 extends StatefulWidget {
   const Signup3({super.key});
@@ -15,14 +11,17 @@ class Signup3 extends StatefulWidget {
 }
 
 class _Signup3 extends State<Signup3> {
+  final AuthController signupController = Get.find<AuthController>();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   // Add controllers for the password fields
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController(
+    text: "",
+  );
   final TextEditingController _confirmPasswordController =
-      TextEditingController();
+      TextEditingController(text: "");
 
   @override
   void dispose() {
@@ -52,7 +51,7 @@ class _Signup3 extends State<Signup3> {
             ),
 
             // Dark overlay for better contrast
-            Container(color: Colors.black.withOpacity(0.3)),
+            Container(color: Colors.black.withAlpha(64)),
 
             // Main content
             Center(
@@ -89,7 +88,7 @@ class _Signup3 extends State<Signup3> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withAlpha(64),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -125,6 +124,9 @@ class _Signup3 extends State<Signup3> {
 
                                 // Email field
                                 TextFormField(
+                                  onChanged: (value) {
+                                    signupController.email.value = value;
+                                  },
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                     hintText: "Enter your email address",
@@ -162,6 +164,9 @@ class _Signup3 extends State<Signup3> {
 
                                 // Password field
                                 TextFormField(
+                                  onChanged: (value) {
+                                    signupController.password.value = value;
+                                  },
                                   controller: _passwordController,
                                   obscureText: _obscurePassword,
                                   decoration: InputDecoration(
@@ -304,41 +309,63 @@ class _Signup3 extends State<Signup3> {
                                     SizedBox(
                                       width: 120,
                                       height: 45,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          if (_formKey.currentState!
-                                              .validate()) {
-                                            // Implement verification logic
-
-                                            showSnackBar(
-                                              "Success",
-                                              "Account created successfully!",
-                                            );
-                                            Get.toNamed(RouteNames.login);
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.orange,
-                                          foregroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
+                                      child: Obx(
+                                        () => ElevatedButton(
+                                          onPressed: () {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              signupController.signup(
+                                                signupController.email.value,
+                                                signupController.password.value,
+                                                signupController.username.value,
+                                                signupController.name.value,
+                                                signupController
+                                                    .mobileNumber
+                                                    .value,
+                                                signupController
+                                                    .dateOfBirth
+                                                    .value,
+                                                signupController
+                                                    .localAddress
+                                                    .value,
+                                                /* signupController
+                                                    .localPincode
+                                                    .value, */
+                                                signupController
+                                                    .permanentAddress
+                                                    .value,
+                                                /* signupController
+                                                    .permanentPincode
+                                                    .value, */
+                                              );
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.orange,
+                                            foregroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
+                                            elevation: 3,
                                           ),
-                                          elevation: 3,
-                                        ),
-                                        child: const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Verify",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                signupController
+                                                        .signupLoading
+                                                        .value
+                                                    ? "Verifying..."
+                                                    : "Verify",
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),

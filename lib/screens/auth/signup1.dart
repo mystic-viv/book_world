@@ -1,13 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:ui';
+import 'package:book_world/controllers/auth_controller.dart';
 import 'package:book_world/routes/route_names.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/auth/signup2.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 
 class Signup1 extends StatefulWidget {
   const Signup1({super.key});
+  // Removed from here as it cannot be used in a const context
 
   @override
   State<StatefulWidget> createState() => _Signup();
@@ -15,6 +16,7 @@ class Signup1 extends StatefulWidget {
 
 class _Signup extends State<Signup1> {
   final _formKey = GlobalKey<FormState>();
+  final AuthController signupController = Get.put(AuthController());
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +111,9 @@ class _Signup extends State<Signup1> {
                                 // Full Name field
                                 const SizedBox(height: 8),
                                 TextFormField(
+                                  onChanged: (value) {
+                                    signupController.name.value = value;
+                                  },
                                   decoration: InputDecoration(
                                     hintText: "Enter your full name",
                                     prefixIcon: const Icon(
@@ -133,6 +138,12 @@ class _Signup extends State<Signup1> {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter your full name';
                                     }
+                                    if (!RegExp(
+                                      r'^[\p{L}][\p{L} ]*$',
+                                      unicode: true,
+                                    ).hasMatch(value)) {
+                                      return 'Full name must not contain numbers or invalid characters';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -141,6 +152,9 @@ class _Signup extends State<Signup1> {
                                 // Username field
                                 const SizedBox(height: 8),
                                 TextFormField(
+                                  onChanged: (value) {
+                                    signupController.username.value = value;
+                                  },
                                   decoration: InputDecoration(
                                     hintText: "Create a username",
                                     prefixIcon: const Icon(
@@ -165,12 +179,17 @@ class _Signup extends State<Signup1> {
                                     if (value == null || value.isEmpty) {
                                       return 'Please create a username';
                                     }
+                                    if (!RegExp(
+                                      r'^[a-zA-Z_][a-zA-Z0-9._-]*$',
+                                    ).hasMatch(value)) {
+                                      return 'Username must start with an alphabet or underscore and can only contain alphabets, numbers, hyphens, dots, and underscores';
+                                    }
                                     return null;
                                   },
                                 ),
                                 const SizedBox(height: 5),
                                 const Text(
-                                  "Contains alphabets, numbers, hyphen and underscore",
+                                  "Contains alphabets, numbers, hyphen, dot or underscore",
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
@@ -181,6 +200,9 @@ class _Signup extends State<Signup1> {
                                 // Mobile Number field
                                 const SizedBox(height: 8),
                                 TextFormField(
+                                  onChanged: (value) {
+                                    signupController.mobileNumber.value = value;
+                                  },
                                   keyboardType: TextInputType.phone,
                                   decoration: InputDecoration(
                                     hintText: "Enter your mobile number",

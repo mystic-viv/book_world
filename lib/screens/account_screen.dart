@@ -7,7 +7,41 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
+  final String userName;
+  final String userEmail;
+  AccountScreen({super.key})
+    : userName = StorageServices.userSession?['name']!,
+      userEmail = StorageServices.userSession?['email']!;
+
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Log Out"),
+              content: const Text("Are you sure you want to log out?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    StorageServices.clearAll();
+                    Get.offAllNamed(RouteNames.login);
+                  },
+                  child: const Text("Log Out"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   Widget _buildMenuItem(
     BuildContext context,
@@ -34,43 +68,13 @@ class AccountScreen extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right, color: Colors.orange),
         onTap: () {
           if (title == 'Log Out') {
+            StorageServices.setUserSession(null);
             _confirmLogout(context);
           } else if (screen != null) {
             Get.to(() => screen); // Navigate to the screen directly
           }
         },
       ),
-    );
-  }
-
-  void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Log Out"),
-          content: const Text("Are you sure you want to log out?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                // Close the dialog
-                Navigator.of(context).pop();
-                
-                // Use a simpler approach that doesn't depend on Supabase
-                StorageServices.clearAll();
-                
-                // Navigate to login screen
-                Get.offAllNamed(RouteNames.login);
-              },
-              child: const Text("Log Out"),
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -127,14 +131,11 @@ class AccountScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Vivek Sharma',
+                  Text(
+                    userName,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  Text(
-                    'Sharma.vivek@gmail.com',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
+                  Text(userEmail, style: TextStyle(color: Colors.grey[600])),
                 ],
               ),
             ),
