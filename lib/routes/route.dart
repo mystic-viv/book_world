@@ -24,6 +24,6 @@ class Routes {
       name: RouteNames.borrowedBooks,
       page: () => const BorrowedBooksScreen(),
     ),
-    GetPage(name: RouteNames.account, page: () => const AccountScreen()),
+    GetPage(name: RouteNames.account, page: () => AccountScreen()),
   ];
 }

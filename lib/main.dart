@@ -69,7 +69,7 @@ class BookWorldApp extends StatelessWidget {
 class ErrorBoundary extends StatefulWidget {
   final Widget child;
 
-  const ErrorBoundary({Key? key, required this.child}) : super(key: key);
+  const ErrorBoundary({super.key, required this.child});
 
   @override
   ErrorBoundaryState createState() => ErrorBoundaryState();
@@ -118,7 +118,6 @@ class ErrorBoundaryState extends State<ErrorBoundary> {
     return widget.child;
   }
 
-  @override
   void catchError(Object error, StackTrace stackTrace) {
     setState(() {
       hasError = true;
@@ -140,7 +139,7 @@ class _MainNavigatorState extends State<MainNavigator> {
     const HomeScreen(),
     const SavedBooksScreen(),
     const BorrowedBooksScreen(),
-    const AccountScreen(),
+    AccountScreen(),
   ];
 
   @override

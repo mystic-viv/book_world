@@ -2,12 +2,45 @@ import 'package:book_world/routes/route_names.dart';
 import 'package:book_world/screens/Users/borrowed_books_screen.dart';
 import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:book_world/services/storage_service.dart';
-import 'package:book_world/services/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
+  final String userName;
+  final String userEmail;
+  AccountScreen({super.key})
+    : userName = StorageServices.userSession?['name'] ?? "Guest",
+      userEmail = StorageServices.userSession?['email'] ?? "guest@example.com";
+
+  String profileImgText() {
+    // Check if userName is null or empty
+    if (userName.isEmpty) {
+      return "G"; // Default value for unknown user
+    }
+
+    // Trim and split the name
+    List<String> nameParts = userName.trim().split(' ');
+
+    // Filter out empty parts
+    nameParts = nameParts.where((part) => part.isNotEmpty).toList();
+
+    if (nameParts.isEmpty) {
+      return "U"; // Default value if no valid parts after filtering
+    }
+
+    if (nameParts.length == 1) {
+      // If only one name part, return its first letter
+      return nameParts[0][0].toUpperCase();
+    } else {
+      // Get first letter of first name and first letter of last name
+      String firstInitial = nameParts.first[0].toUpperCase();
+      String lastInitial = nameParts.last[0].toUpperCase();
+      return firstInitial + lastInitial;
+    }
+  }
+
+  // ignore: non_constant_identifier_names
+  String get profile_image_text => profileImgText();
 
   Widget _buildMenuItem(
     BuildContext context,
@@ -48,25 +81,31 @@ class AccountScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Log Out"),
+          title: const Text(
+            "Log Out",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           content: const Text("Are you sure you want to log out?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.green),
+              ),
             ),
             TextButton(
               onPressed: () {
                 // Close the dialog
                 Navigator.of(context).pop();
-                
+
                 // Use a simpler approach that doesn't depend on Supabase
                 StorageServices.clearAll();
-                
+
                 // Navigate to login screen
                 Get.offAllNamed(RouteNames.login);
               },
-              child: const Text("Log Out"),
+              child: const Text("Log Out", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -100,12 +139,12 @@ class AccountScreen extends StatelessWidget {
                   // Profile Image and Edit Button
                   Stack(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 65,
                         backgroundColor: Colors.black,
                         child: Text(
-                          'VS',
-                          style: TextStyle(color: Colors.white, fontSize: 24),
+                          profile_image_text,
+                          style: TextStyle(color: Colors.white, fontSize: 36),
                         ),
                       ),
                       Positioned(
@@ -127,14 +166,11 @@ class AccountScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Vivek Sharma',
+                  Text(
+                    userName,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  Text(
-                    'Sharma.vivek@gmail.com',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
+                  Text(userEmail, style: TextStyle(color: Colors.grey[600])),
                 ],
               ),
             ),
