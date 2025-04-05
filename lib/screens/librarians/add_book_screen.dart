@@ -1,9 +1,9 @@
 // ignore_for_file: unused_element
 
+import 'package:book_world/screens/librarians/issue_return_screen.dart';
+import 'package:book_world/screens/librarians/librarian_home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:practice_app/librarian_screen/librarian_home_screen.dart';
-import 'package:practice_app/librarian_screen/issue_return_screen.dart';
-import 'package:practice_app/librarian_screen/all_students_screen.dart';
+import 'package:book_world/screens/librarians/all_students_screen.dart';
 
 class AddBookScreen extends StatefulWidget {
   const AddBookScreen({super.key});
@@ -23,7 +23,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
     'Fantasy',
     'Mystery',
     'Thriller',
-    'Horror'
+    'Horror',
   ];
 
   String selectedGenre = '--Select--';
@@ -36,11 +36,13 @@ class _AddBookScreenState extends State<AddBookScreen> {
     );
   }
 
-  Widget _buildInputField(String label,
-      {bool isTextArea = false,
-      String? hintText,
-      int? maxLines,
-      TextInputType? keyboardType}) {
+  Widget _buildInputField(
+    String label, {
+    bool isTextArea = false,
+    String? hintText,
+    int? maxLines,
+    TextInputType? keyboardType,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -60,10 +62,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
           ),
           const SizedBox(height: 8),
           if (isTextArea)
@@ -110,8 +109,12 @@ class _AddBookScreenState extends State<AddBookScreen> {
     );
   }
 
-  Widget _buildDropdownField(String label, List<String> items, String value,
-      Function(String?) onChanged) {
+  Widget _buildDropdownField(
+    String label,
+    List<String> items,
+    String value,
+    Function(String?) onChanged,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -131,10 +134,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
           ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
@@ -153,12 +153,10 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 borderSide: const BorderSide(color: Colors.orange),
               ),
             ),
-            items: items.map((String item) {
-              return DropdownMenuItem(
-                value: item,
-                child: Text(item),
-              );
-            }).toList(),
+            items:
+                items.map((String item) {
+                  return DropdownMenuItem(value: item, child: Text(item));
+                }).toList(),
             onChanged: onChanged,
           ),
         ],
@@ -186,10 +184,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
@@ -225,11 +220,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
               padding: EdgeInsets.only(left: 0, top: 44, bottom: 16),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.add_box,
-                    color: Colors.orange,
-                    size: 32,
-                  ),
+                  Icon(Icons.add_box, color: Colors.orange, size: 32),
                   SizedBox(width: 8),
                   Text(
                     'Add New Book',
@@ -242,12 +233,19 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ],
               ),
             ),
-            _buildInputField('Title of Book',
-                hintText: 'Enter the title of book..'),
-            _buildInputField('Author Name',
-                hintText: 'Enter the author name..'),
-            _buildInputField('Book Description',
-                hintText: 'Enter the book description..', maxLines: 3),
+            _buildInputField(
+              'Title of Book',
+              hintText: 'Enter the title of book..',
+            ),
+            _buildInputField(
+              'Author Name',
+              hintText: 'Enter the author name..',
+            ),
+            _buildInputField(
+              'Book Description',
+              hintText: 'Enter the book description..',
+              maxLines: 3,
+            ),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
               padding: const EdgeInsets.all(16),
@@ -267,10 +265,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 children: [
                   const Text(
                     'Genres',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
@@ -289,12 +284,13 @@ class _AddBookScreenState extends State<AddBookScreen> {
                         borderSide: const BorderSide(color: Colors.orange),
                       ),
                     ),
-                    items: genres.map((String genre) {
-                      return DropdownMenuItem<String>(
-                        value: genre,
-                        child: Text(genre),
-                      );
-                    }).toList(),
+                    items:
+                        genres.map((String genre) {
+                          return DropdownMenuItem<String>(
+                            value: genre,
+                            child: Text(genre),
+                          );
+                        }).toList(),
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedGenre = newValue!;
@@ -304,9 +300,11 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ],
               ),
             ),
-            _buildInputField('Available Books',
-                hintText: 'Enter number of available books..',
-                keyboardType: TextInputType.number),
+            _buildInputField(
+              'Available Books',
+              hintText: 'Enter number of available books..',
+              keyboardType: TextInputType.number,
+            ),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
               padding: const EdgeInsets.all(16),
@@ -326,10 +324,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 children: [
                   const Text(
                     'Publication Year',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<int>(
@@ -348,13 +343,16 @@ class _AddBookScreenState extends State<AddBookScreen> {
                         borderSide: const BorderSide(color: Colors.orange),
                       ),
                     ),
-                    items: List<int>.generate(DateTime.now().year - 1900 + 1,
-                        (index) => DateTime.now().year - index).map((int year) {
-                      return DropdownMenuItem<int>(
-                        value: year,
-                        child: Text(year.toString()),
-                      );
-                    }).toList(),
+                    items:
+                        List<int>.generate(
+                          DateTime.now().year - 1900 + 1,
+                          (index) => DateTime.now().year - index,
+                        ).map((int year) {
+                          return DropdownMenuItem<int>(
+                            value: year,
+                            child: Text(year.toString()),
+                          );
+                        }).toList(),
                     onChanged: (int? newValue) {
                       setState(() {
                         selectedYear = newValue!;
@@ -383,10 +381,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 children: [
                   const Text(
                     'Upload Cover Photo',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
@@ -425,10 +420,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 children: [
                   const Text(
                     'Upload E-Book/PDF',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
@@ -463,10 +455,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ),
                 child: const Text(
                   'Add Book',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -490,21 +479,27 @@ class _AddBookScreenState extends State<AddBookScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const LibrarianHomeScreen()),
+                onTap:
+                    () =>
+                        _navigateToScreen(context, const LibrarianHomeScreen()),
                 child: _buildNavItem(icon: Icons.home, label: 'Home'),
               ),
               _buildNavItem(
-                  icon: Icons.add_box, label: 'Add Book', isSelected: true),
-              GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const IssueReturnScreen()),
-                child: _buildNavItem(
-                    icon: Icons.swap_horiz, label: 'Issue/Return'),
+                icon: Icons.add_box,
+                label: 'Add Book',
+                isSelected: true,
               ),
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const AllStudentsScreen()),
+                onTap:
+                    () => _navigateToScreen(context, const IssueReturnScreen()),
+                child: _buildNavItem(
+                  icon: Icons.swap_horiz,
+                  label: 'Issue/Return',
+                ),
+              ),
+              GestureDetector(
+                onTap:
+                    () => _navigateToScreen(context, const AllStudentsScreen()),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],
@@ -522,10 +517,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          color: isSelected ? Colors.orange : Colors.grey,
-        ),
+        Icon(icon, color: isSelected ? Colors.orange : Colors.grey),
         Text(
           label,
           style: TextStyle(

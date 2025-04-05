@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:practice_app/librarian_screen/librarian_home_screen.dart';
-import 'package:practice_app/librarian_screen/add_book_screen.dart';
-import 'package:practice_app/librarian_screen/issue_return_screen.dart';
-import 'package:practice_app/librarian_screen/all_students_screen.dart';
+import 'package:book_world/screens/librarians/librarian_home_screen.dart';
+import 'package:book_world/screens/librarians/add_book_screen.dart';
+import 'package:book_world/screens/librarians/issue_return_screen.dart';
+import 'package:book_world/screens/librarians/all_students_screen.dart';
 
 class BookInfo {
   final String id;
@@ -30,11 +30,7 @@ class AllBooksScreen extends StatefulWidget {
 class _AllBooksScreenState extends State<AllBooksScreen> {
   final TextEditingController _searchController = TextEditingController();
   final List<BookInfo> books = [
-    BookInfo(
-      id: '001',
-      name: 'Atomic Habits',
-      authorName: 'James Clear',
-    ),
+    BookInfo(id: '001', name: 'Atomic Habits', authorName: 'James Clear'),
     BookInfo(
       id: '002',
       name: 'Python Programming',
@@ -52,11 +48,7 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
       name: 'Encyclopedia of Gardening',
       authorName: 'T.W. sanders, F.L.S.',
     ),
-    BookInfo(
-      id: '005',
-      name: 'Dead Star',
-      authorName: 'James Clear',
-    ),
+    BookInfo(id: '005', name: 'Dead Star', authorName: 'James Clear'),
   ];
 
   List<BookInfo> filteredBooks = [];
@@ -71,11 +63,12 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
   void _filterBooks() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      filteredBooks = books.where((book) {
-        return book.id.toLowerCase().contains(query) ||
-            book.name.toLowerCase().contains(query) ||
-            book.authorName.toLowerCase().contains(query);
-      }).toList();
+      filteredBooks =
+          books.where((book) {
+            return book.id.toLowerCase().contains(query) ||
+                book.name.toLowerCase().contains(query) ||
+                book.authorName.toLowerCase().contains(query);
+          }).toList();
     });
   }
 
@@ -106,21 +99,12 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
           children: [
             Text(
               'Book ID: ${book.id}',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            Text(
-              'Name: ${book.name}',
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text('Name: ${book.name}', style: const TextStyle(fontSize: 16)),
             Text(
               'Author\'s Name: ${book.authorName}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
           ],
         ),
@@ -133,35 +117,28 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
                 children: [
                   const Text(
                     'Genres:',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     book.genres!.join(', '),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                 ],
               ),
             ),
             if (book.availableBooks != null)
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'Available Books:',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -189,10 +166,7 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
                 ),
                 child: const Text(
                   'Books Issued',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -213,11 +187,7 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
             padding: EdgeInsets.only(left: 16, top: 60, bottom: 16),
             child: Row(
               children: [
-                Icon(
-                  Icons.library_books,
-                  color: Colors.orange,
-                  size: 32,
-                ),
+                Icon(Icons.library_books, color: Colors.orange, size: 32),
                 SizedBox(width: 8),
                 Text(
                   'All Books In Library',
@@ -284,8 +254,9 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const LibrarianHomeScreen()),
+                onTap:
+                    () =>
+                        _navigateToScreen(context, const LibrarianHomeScreen()),
                 child: _buildNavItem(icon: Icons.home, label: 'Home'),
               ),
               GestureDetector(
@@ -293,14 +264,16 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
                 child: _buildNavItem(icon: Icons.add_box, label: 'Add Book'),
               ),
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const IssueReturnScreen()),
+                onTap:
+                    () => _navigateToScreen(context, const IssueReturnScreen()),
                 child: _buildNavItem(
-                    icon: Icons.swap_horiz, label: 'Issue/Return'),
+                  icon: Icons.swap_horiz,
+                  label: 'Issue/Return',
+                ),
               ),
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const AllStudentsScreen()),
+                onTap:
+                    () => _navigateToScreen(context, const AllStudentsScreen()),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],
@@ -318,10 +291,7 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          color: isSelected ? Colors.orange : Colors.grey,
-        ),
+        Icon(icon, color: isSelected ? Colors.orange : Colors.grey),
         Text(
           label,
           style: TextStyle(

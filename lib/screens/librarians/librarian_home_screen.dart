@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:practice_app/librarian_screen/add_book_screen.dart';
-import 'package:practice_app/librarian_screen/issue_return_screen.dart';
-import 'package:practice_app/librarian_screen/all_students_screen.dart';
-import 'package:practice_app/librarian_screen/all_books_screen.dart';
+import 'package:book_world/screens/librarians/add_book_screen.dart';
+import 'package:book_world/screens/librarians/issue_return_screen.dart';
+import 'package:book_world/screens/librarians/all_students_screen.dart';
+import 'package:book_world/screens/librarians/all_books_screen.dart';
 
 class LibrarianHomeScreen extends StatelessWidget {
   const LibrarianHomeScreen({super.key});
@@ -34,10 +34,7 @@ class LibrarianHomeScreen extends StatelessWidget {
       ),
       child: ListTile(
         leading: Icon(icon, color: Colors.orange),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 16),
-        ),
+        title: Text(title, style: const TextStyle(fontSize: 16)),
         trailing: const Icon(Icons.chevron_right, color: Colors.orange),
         onTap: onTap,
       ),
@@ -119,7 +116,8 @@ class LibrarianHomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const AllBooksScreen()),
+                          builder: (context) => const AllBooksScreen(),
+                        ),
                       );
                     },
                   ),
@@ -171,14 +169,16 @@ class LibrarianHomeScreen extends StatelessWidget {
                 child: _buildNavItem(icon: Icons.add_box, label: 'Add Book'),
               ),
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const IssueReturnScreen()),
+                onTap:
+                    () => _navigateToScreen(context, const IssueReturnScreen()),
                 child: _buildNavItem(
-                    icon: Icons.swap_horiz, label: 'Issue/Return'),
+                  icon: Icons.swap_horiz,
+                  label: 'Issue/Return',
+                ),
               ),
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const AllStudentsScreen()),
+                onTap:
+                    () => _navigateToScreen(context, const AllStudentsScreen()),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],
@@ -196,10 +196,7 @@ class LibrarianHomeScreen extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          color: isSelected ? Colors.orange : Colors.grey,
-        ),
+        Icon(icon, color: isSelected ? Colors.orange : Colors.grey),
         Text(
           label,
           style: TextStyle(

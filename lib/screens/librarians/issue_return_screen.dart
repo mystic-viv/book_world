@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:practice_app/librarian_screen/librarian_home_screen.dart';
-import 'package:practice_app/librarian_screen/add_book_screen.dart';
-import 'package:practice_app/librarian_screen/all_students_screen.dart';
+import 'package:book_world/screens/librarians/librarian_home_screen.dart';
+import 'package:book_world/screens/librarians/add_book_screen.dart';
+import 'package:book_world/screens/librarians/all_students_screen.dart';
 import 'dart:ui';
 
 class IssueReturnScreen extends StatefulWidget {
@@ -34,10 +34,7 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
           ),
           const SizedBox(height: 8),
           TextField(
@@ -134,9 +131,7 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
               borderRadius: BorderRadius.circular(12),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                child: Container(
-                  color: Colors.white.withAlpha(13),
-                ),
+                child: Container(color: Colors.white.withAlpha(13)),
               ),
             ),
         ],
@@ -157,11 +152,7 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
               padding: EdgeInsets.only(left: 0, top: 44, bottom: 16),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.swap_horiz,
-                    color: Colors.orange,
-                    size: 32,
-                  ),
+                  Icon(Icons.swap_horiz, color: Colors.orange, size: 32),
                   SizedBox(width: 8),
                   Text(
                     'Issue/Return Books',
@@ -214,8 +205,9 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const LibrarianHomeScreen()),
+                onTap:
+                    () =>
+                        _navigateToScreen(context, const LibrarianHomeScreen()),
                 child: _buildNavItem(icon: Icons.home, label: 'Home'),
               ),
               GestureDetector(
@@ -223,12 +215,13 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
                 child: _buildNavItem(icon: Icons.add_box, label: 'Add Book'),
               ),
               _buildNavItem(
-                  icon: Icons.swap_horiz,
-                  label: 'Issue/Return',
-                  isSelected: true),
+                icon: Icons.swap_horiz,
+                label: 'Issue/Return',
+                isSelected: true,
+              ),
               GestureDetector(
-                onTap: () =>
-                    _navigateToScreen(context, const AllStudentsScreen()),
+                onTap:
+                    () => _navigateToScreen(context, const AllStudentsScreen()),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],
@@ -246,10 +239,7 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          color: isSelected ? Colors.orange : Colors.grey,
-        ),
+        Icon(icon, color: isSelected ? Colors.orange : Colors.grey),
         Text(
           label,
           style: TextStyle(
@@ -262,9 +252,6 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
   }
 
   void _navigateToScreen(BuildContext context, Widget screen) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
 }

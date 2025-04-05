@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:practice_app/librarian_screen/librarian_home_screen.dart';
-import 'package:practice_app/librarian_screen/add_book_screen.dart';
-import 'package:practice_app/librarian_screen/issue_return_screen.dart';
+import 'package:book_world/screens/librarians/librarian_home_screen.dart';
+import 'package:book_world/screens/librarians/add_book_screen.dart';
+import 'package:book_world/screens/librarians/issue_return_screen.dart';
 
 class StudentInfo {
   final String id;
@@ -74,10 +74,11 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
   void _filterStudents() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      filteredStudents = students.where((student) {
-        return student.id.toLowerCase().contains(query) ||
-            student.name.toLowerCase().contains(query);
-      }).toList();
+      filteredStudents =
+          students.where((student) {
+            return student.id.toLowerCase().contains(query) ||
+                student.name.toLowerCase().contains(query);
+          }).toList();
     });
   }
 
@@ -101,21 +102,12 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
           children: [
             Text(
               'Student ID: ${student.id}',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            Text(
-              'Name: ${student.name}',
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text('Name: ${student.name}', style: const TextStyle(fontSize: 16)),
             Text(
               'Registered On: ${student.registrationDate}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
           ],
         ),
@@ -142,10 +134,7 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
                 ),
                 child: const Text(
                   'Total Books Issued',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -163,17 +152,11 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
         children: [
           Text(
             '$label:',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
           ),
         ],
       ),
@@ -191,11 +174,7 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
             padding: EdgeInsets.only(left: 16, top: 60, bottom: 16),
             child: Row(
               children: [
-                Icon(
-                  Icons.people,
-                  color: Colors.orange,
-                  size: 32,
-                ),
+                Icon(Icons.people, color: Colors.orange, size: 32),
                 SizedBox(width: 8),
                 Text(
                   'All Students Registered',
@@ -266,7 +245,8 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const LibrarianHomeScreen()),
+                      builder: (context) => const LibrarianHomeScreen(),
+                    ),
                   );
                 },
                 child: _buildNavItem(icon: Icons.home, label: 'Home'),
@@ -276,7 +256,8 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AddBookScreen()),
+                      builder: (context) => const AddBookScreen(),
+                    ),
                   );
                 },
                 child: _buildNavItem(icon: Icons.add_box, label: 'Add Book'),
@@ -286,14 +267,20 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const IssueReturnScreen()),
+                      builder: (context) => const IssueReturnScreen(),
+                    ),
                   );
                 },
                 child: _buildNavItem(
-                    icon: Icons.swap_horiz, label: 'Issue/Return'),
+                  icon: Icons.swap_horiz,
+                  label: 'Issue/Return',
+                ),
               ),
               _buildNavItem(
-                  icon: Icons.people, label: 'All Students', isSelected: true),
+                icon: Icons.people,
+                label: 'All Students',
+                isSelected: true,
+              ),
             ],
           ),
         ),
@@ -309,10 +296,7 @@ class _AllStudentsScreenState extends State<AllStudentsScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          color: isSelected ? Colors.orange : Colors.grey,
-        ),
+        Icon(icon, color: isSelected ? Colors.orange : Colors.grey),
         Text(
           label,
           style: TextStyle(
