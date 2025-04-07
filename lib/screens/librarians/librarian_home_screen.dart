@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:book_world/screens/librarians/add_book_screen.dart';
 import 'package:book_world/screens/librarians/issue_return_screen.dart';
-import 'package:book_world/screens/librarians/all_students_screen.dart';
+import 'package:book_world/screens/librarians/all_users_screen.dart';
 import 'package:book_world/screens/librarians/all_books_screen.dart';
 
 class LibrarianHomeScreen extends StatelessWidget {
@@ -178,7 +178,7 @@ class LibrarianHomeScreen extends StatelessWidget {
               ),
               GestureDetector(
                 onTap:
-                    () => _navigateToScreen(context, const AllStudentsScreen()),
+                    () => _navigateToScreen(context, const AllUsersScreen()),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],

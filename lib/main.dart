@@ -5,6 +5,7 @@ import 'package:book_world/screens/Users/account_screen.dart';
 import 'package:book_world/screens/Users/borrowed_books_screen.dart';
 import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:book_world/screens/Users/saved_books_screen.dart';
+import 'package:book_world/services/auth_service.dart';
 import 'package:book_world/services/storage_service.dart';
 import 'package:book_world/services/supabase_service.dart';
 import 'package:book_world/theme/theme.dart';
@@ -25,6 +26,22 @@ void main() async {
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
+
+  // Set up auth state change listener
+  SupabaseService.client?.auth.onAuthStateChange.listen((data) {
+    final AuthChangeEvent event = data.event;
+
+    if (event == AuthChangeEvent.signedOut) {
+      // User signed out, redirect to login
+      Get.offAllNamed(RouteNames.login);
+    } else if (event == AuthChangeEvent.signedIn) {
+      // User signed in, update session
+      if (data.session != null) {
+        // Refresh user session data
+        AuthService.refreshSession(data.session!);
+      }
+    }
+  });
 
   // Initialize GetStorage
   await GetStorage.init();

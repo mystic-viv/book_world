@@ -27,14 +27,14 @@ class StudentInfo {
   });
 }
 
-class AllStudentsScreen extends StatefulWidget {
-  const AllStudentsScreen({super.key});
+class AllUsersScreen extends StatefulWidget {
+  const AllUsersScreen({super.key});
 
   @override
-  State<AllStudentsScreen> createState() => _AllStudentsScreenState();
+  State<AllUsersScreen> createState() => _AllUsersScreenState();
 }
 
-class _AllStudentsScreenState extends State<AllStudentsScreen> {
+class _AllUsersScreenState extends State<AllUsersScreen> {
   final TextEditingController _searchController = TextEditingController();
   final List<StudentInfo> students = [
     StudentInfo(

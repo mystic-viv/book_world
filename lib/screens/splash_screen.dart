@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, duplicate_ignore
 
 import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/services/auth_service.dart';
 import 'package:book_world/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,14 +28,29 @@ class _Splash extends State<Splash> {
       // Debugging: Print the user session
       debugPrint('User session: ${StorageServices.userSession}');
 
-      // Ensure the widget is still mounted before navigating
-      // if (!mounted) return;
-      final userSession = StorageServices.userSession;
-      debugPrint("Navigating to ${userSession == null ? 'login' : 'home'}");
-      await Get.offAllNamed(
-        userSession == null ? RouteNames.login : RouteNames.home,
-      );
-      // Navigate based on the session state
+      // Check if user is authenticated
+      if (AuthService.isAuthenticated()) {
+        // User is authenticated, check role
+        final role = AuthService.getUserRole();
+        
+        if (role == 'admin') {
+          // Admin user
+          debugPrint("Navigating to admin dashboard");
+          await Get.offAllNamed(RouteNames.adminDashboard);
+        } else if (role == 'librarian') {
+          // Librarian user
+          debugPrint("Navigating to librarian dashboard");
+          await Get.offAllNamed(RouteNames.librarianHome);
+        } else {
+          // Regular user
+          debugPrint("Navigating to home");
+          await Get.offAllNamed(RouteNames.home);
+        }
+      } else {
+        // User is not authenticated
+        debugPrint("Navigating to login");
+        await Get.offAllNamed(RouteNames.login);
+      }
     } catch (error) {
       debugPrint('Error during navigation: $error');
       Get.offAllNamed(RouteNames.login); // Fallback to login screen

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:book_world/screens/librarians/librarian_home_screen.dart';
 import 'package:book_world/screens/librarians/add_book_screen.dart';
-import 'package:book_world/screens/librarians/all_students_screen.dart';
+import 'package:book_world/screens/librarians/all_users_screen.dart';
 import 'dart:ui';
 
 class IssueReturnScreen extends StatefulWidget {
@@ -221,7 +221,7 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
               ),
               GestureDetector(
                 onTap:
-                    () => _navigateToScreen(context, const AllStudentsScreen()),
+                    () => _navigateToScreen(context, const AllUsersScreen()),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],

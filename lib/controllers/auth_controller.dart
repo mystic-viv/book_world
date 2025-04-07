@@ -1,8 +1,8 @@
 // ignore_for_file: avoid_print
 
 import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/services/auth_service.dart';
 import 'package:book_world/services/storage_service.dart';
-import 'package:book_world/services/supabase_service.dart';
 import 'package:book_world/utils/helper.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -14,27 +14,13 @@ class AuthController extends GetxController {
   var name = ''.obs;
   var username = ''.obs;
   var mobileNumber = ''.obs;
-  var dateOfBirth = DateTime.now().obs; // Reactive nullable DateTime
+  var dateOfBirth = DateTime.now().obs;
   var localAddress = ''.obs;
   var localPincode = ''.obs;
   var permanentAddress = ''.obs;
   var permanentPincode = ''.obs;
   var email = ''.obs;
   var password = ''.obs;
-
-  //Save user data to local storage
-  void saveUserData() {
-    storage.write('name', name.value);
-    storage.write('username', username.value);
-    storage.write('mobileNumber', mobileNumber.value);
-    storage.write('dateOfBirth', dateOfBirth.value.toIso8601String());
-    storage.write('localAdress', localAddress.value);
-    storage.write('localPincode', localPincode.value);
-    storage.write('permanentAddress', permanentAddress.value);
-    storage.write('permanentPincode', permanentPincode.value);
-    storage.write('email', email.value);
-    storage.write('password', password.value);
-  }
 
   var signupLoading = false.obs;
   var loginLoading = false.obs;
@@ -64,44 +50,26 @@ class AuthController extends GetxController {
     String mobileNumber,
     DateTime dateOfBirth,
     String localAddress,
-    //String localPincode,
     String permanentAddress,
-    //String permanentPincode,
   ) async {
     try {
       signupLoading.value = true;
 
-      // Check if client is available
-      final client = SupabaseService.client;
-      if (client == null) {
-        throw Exception("Supabase client is not initialized");
-      }
-
-      // Call Supabase signup API
-      final AuthResponse data = await client.auth.signUp(
+      // Use the AuthService for signup
+      final AuthResponse response = await AuthService.signUp(
         email: email,
         password: password,
-        data: {
-          'username': username,
-          'name': name,
-          'mobileNumber': mobileNumber,
-          'dateOfBirth': dateOfBirth.toIso8601String(),
-          'localAddress': localAddress,
-          // 'localPincode': localPincode,
-          'permanentAddress': permanentAddress,
-          // 'permanentPincode': permanentPincode,
-        },
+        username: username,
+        name: name,
+        mobileNumber: mobileNumber,
+        dateOfBirth: dateOfBirth,
+        localAddress: localAddress,
+        permanentAddress: permanentAddress,
       );
-      signupLoading.value = false;
-      if (data.user != null) {
-        // Save user data to local storage
-        StorageServices.setUserSession({
-          'email': data.user!.email,
-          'username': data.user!.userMetadata!['username'],
-          'name': data.user!.userMetadata!['name'],
-          'token': data.session?.accessToken,
-        });
 
+      signupLoading.value = false;
+      
+      if (response.user != null) {
         showSnackBar("Success", "Account created successfully!");
         Get.offAllNamed(RouteNames.login); // Navigate to login screen
       }
@@ -110,6 +78,7 @@ class AuthController extends GetxController {
       showSnackBar("Error", error.message); // Show error message
     } catch (error) {
       signupLoading.value = false;
+      print("Signup error: $error");
       showSnackBar(
         "Error",
         "Something went wrong. Please try again.",
@@ -122,60 +91,21 @@ class AuthController extends GetxController {
     try {
       loginLoading.value = true;
 
-      // Check if client is available
-      final client = SupabaseService.client;
-      if (client == null) {
-        throw Exception("Supabase client is not initialized");
-      }
-
-      String email = input; // Default to input being an email
-
-      // Check if the input is not an email (assume it's a username)
-      // Fix the regex pattern by removing the backticks
-      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(input)) {
-        print(
-          "Input is not an email, attempting to fetch email for username: $input",
-        );
-        // Query Supabase to get the email associated with the username
-        final response =
-            await client
-                .from('users') // Ensure 'users' is the correct table name
-                .select(
-                  'email, metadata->>username',
-                ) // Extract 'username' from 'metadata'
-                .eq(
-                  'metadata->>username',
-                  input,
-                ) // Match the username in metadata
-                .maybeSingle();
-
-        if (response == null || response['email'] == null) {
-          throw AuthException('Invalid username or email address');
-        }
-
-        email = response['email']; // Use the retrieved email
-      }
-
-      print("Proceeding with login using email: $email");
-
-      // Proceed with login using the email
-      final AuthResponse response = await client.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      // Use the AuthService for login
+      final AuthResponse response = await AuthService.login(input, password);
+      
       loginLoading.value = false;
 
       if (response.user != null) {
-        // Save the user session
-        StorageServices.setUserSession({
-          'email': response.user!.email,
-          'username': response.user!.userMetadata!['username'],
-          'name': response.user!.userMetadata!['name'],
-          'id': response.user!.id,
-          'token': response.session?.accessToken,
-        });
         showSnackBar("Success", "Logged in successfully!");
-        Get.offAllNamed(RouteNames.home);
+        
+        // Check user role and navigate accordingly
+        final userRole = AuthService.getUserRole();
+        if (userRole == 'librarian') {
+          //Get.offAllNamed(RouteNames.librarianHome);
+        } else {
+          Get.offAllNamed(RouteNames.home);
+        }
       }
     } on AuthException catch (error) {
       loginLoading.value = false;
@@ -183,7 +113,7 @@ class AuthController extends GetxController {
       showSnackBar("Error", error.message);
     } catch (error) {
       loginLoading.value = false;
-      print("Unexpected error: $error");
+      print("Login error: $error");
       showSnackBar("Error", "Something went wrong. Please try again.");
     }
   }
@@ -191,16 +121,8 @@ class AuthController extends GetxController {
   // * Logout Function
   Future<void> logout() async {
     try {
-      // Check if client is available
-      final client = SupabaseService.client;
-      if (client != null) {
-        // Sign out from Supabase
-        await client.auth.signOut();
-      }
-
-      // Clear the user session data
-      StorageServices.clearAll();
-
+      await AuthService.logout();
+      
       // Show success message
       showSnackBar("Success", "Logged out successfully!");
 
@@ -212,7 +134,33 @@ class AuthController extends GetxController {
     }
   }
 
-  // Add this method to your AuthController class
+  // * Check if user is authenticated
+  bool isAuthenticated() {
+    return AuthService.isAuthenticated();
+  }
+
+  // * Get current user role
+  String getUserRole() {
+    return AuthService.getUserRole();
+  }
+
+  // * Check if user is admin
+  bool isAdmin() {
+    return AuthService.isAdmin();
+  }
+
+  // * Check if user is librarian
+  bool isLibrarian() {
+    return AuthService.isLibrarian();
+  }
+
+  // * Get user custom ID
+  String? getUserCustomId() {
+    final session = StorageServices.userSession;
+    return session != null ? session['custom_id'] : null;
+  }
+
+  // * Mock login for testing (can be removed in production)
   Future<void> mockLogin(String email, String password) async {
     try {
       loginLoading.value = true;
@@ -226,6 +174,8 @@ class AuthController extends GetxController {
         'username': 'test_user',
         'name': 'Test User',
         'id': 'mock-user-id',
+        'custom_id': 'BWU-001',
+        'role': 'user',
         'token': 'mock-token',
       };
 

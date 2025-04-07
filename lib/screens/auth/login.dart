@@ -183,6 +183,10 @@ class _Login extends State<Login> {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter your password';
                                     }
+                                    if (value.length < 6) {
+                                      return 'Password must be at least 8 characters long';
+                                    }
+                                    
                                     return null;
                                   },
                                 ),
@@ -274,6 +278,40 @@ class _Login extends State<Login> {
                                     ),
                                   ],
                                 ),
+                                
+                                const SizedBox(height: 20),
+                                // Add these buttons at the bottom of your login form
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Get.toNamed(RouteNames.adminLogin);
+                                      },
+                                      child: const Text(
+                                        "Admin Login",
+                                        style: TextStyle(
+                                          color: Color(0xFFE97F11),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    TextButton(
+                                      onPressed: () {
+                                        Get.toNamed(RouteNames.librarianLogin);
+                                      },
+                                      child: const Text(
+                                        "Librarian Login",
+                                        style: TextStyle(
+                                          color: Color(0xFFE97F11),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
                               ],
                             ),
                           ),

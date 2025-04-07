@@ -3,7 +3,7 @@
 import 'package:book_world/screens/librarians/issue_return_screen.dart';
 import 'package:book_world/screens/librarians/librarian_home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/librarians/all_students_screen.dart';
+import 'package:book_world/screens/librarians/all_users_screen.dart';
 
 class AddBookScreen extends StatefulWidget {
   const AddBookScreen({super.key});
@@ -459,7 +459,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ),
               ),
             ),
-          ],
+          ], 
         ),
       ),
       bottomNavigationBar: Container(
@@ -499,7 +499,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
               ),
               GestureDetector(
                 onTap:
-                    () => _navigateToScreen(context, const AllStudentsScreen()),
+                    () => _navigateToScreen(context, const AllUsersScreen()),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],
