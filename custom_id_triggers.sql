@@ -18,15 +18,3 @@ BEFORE INSERT ON books
 FOR EACH ROW
 WHEN (NEW.custom_id IS NULL)
 EXECUTE FUNCTION generate_book_custom_id();
-
--- Create trigger to handle new users in auth.users
-CREATE TRIGGER on_auth_user_created
-AFTER INSERT ON auth.users
-FOR EACH ROW
-EXECUTE FUNCTION handle_new_auth_user();
-
--- Create trigger to handle updated users in auth.users
-CREATE TRIGGER on_auth_user_updated
-AFTER UPDATE ON auth.users
-FOR EACH ROW
-EXECUTE FUNCTION handle_auth_user_update();

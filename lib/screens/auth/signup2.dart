@@ -194,7 +194,7 @@ class _Signup2 extends State<Signup2> {
                                           if (selectedDate != null) {
                                             setState(() {
                                               datePicker.text =
-                                                  "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+                                                  "${selectedDate.day.toString().padLeft(2,'0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}";
                                             });
                                           }
                                         },

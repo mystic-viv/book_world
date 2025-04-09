@@ -21,7 +21,6 @@ class AuthController extends GetxController {
   var permanentPincode = ''.obs;
   var email = ''.obs;
   var password = ''.obs;
-
   var signupLoading = false.obs;
   var loginLoading = false.obs;
 
@@ -160,35 +159,4 @@ class AuthController extends GetxController {
     return session != null ? session['custom_id'] : null;
   }
 
-  // * Mock login for testing (can be removed in production)
-  Future<void> mockLogin(String email, String password) async {
-    try {
-      loginLoading.value = true;
-
-      // Simulate a delay
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Mock user data
-      final mockUserData = {
-        'email': email,
-        'username': 'test_user',
-        'name': 'Test User',
-        'id': 'mock-user-id',
-        'custom_id': 'BWU-001',
-        'role': 'user',
-        'token': 'mock-token',
-      };
-
-      // Save the mock user session
-      StorageServices.setUserSession(mockUserData);
-
-      loginLoading.value = false;
-      showSnackBar("Success", "Logged in successfully (Mock)!");
-      Get.offAllNamed(RouteNames.home);
-    } catch (error) {
-      loginLoading.value = false;
-      print("Mock login error: $error");
-      showSnackBar("Error", "Something went wrong during mock login.");
-    }
-  }
 }

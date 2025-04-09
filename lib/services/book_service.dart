@@ -18,8 +18,8 @@ class BookService {
       
           final response = await supabase
               .from('books')
-              .select('*, authors(*)')
-              .order('title');
+              .select('*')
+              .order('book_name');
       
           return (response as List).cast<Map<String, dynamic>>();
         } catch (e) {
@@ -32,7 +32,7 @@ class BookService {
     try {
       final response = await supabase
           .from('books')
-          .select('*, authors(*)')
+          .select('*')
           .eq('custom_id', bookId)  // Use custom_id instead of id
           .single();
       
@@ -45,10 +45,9 @@ class BookService {
   
   // Upload a new book (for librarians)
   static Future<Map<String, dynamic>> uploadBook({
-    required String title,
-    required String authorId,
+    required String bookName,
+    required String authorName,
     required String description,
-    required bool isEbook,
     required int totalCopies,
     File? coverImage,
     File? ebookFile,
@@ -73,7 +72,7 @@ class BookService {
       
       // Upload ebook file if provided
       String? ebookUrl;
-      if (isEbook && ebookFile != null) {
+      if (ebookFile != null) {
         final fileExt = path.extension(ebookFile.path);
         final fileName = '$bookId$fileExt';
         
@@ -84,10 +83,8 @@ class BookService {
         ebookUrl = supabase.storage.from('ebooks').getPublicUrl(fileName);
       }
       
-      // For e-books, we don't need to track physical copies
-      // E-books are always available, so we set available_copies equal to total_copies
       // For physical books, we track availability normally
-      final availableCopies = isEbook ? totalCopies : totalCopies;
+      final availableCopies = totalCopies;
       
       // Generate a UUID for the internal ID
       final internalId = uuid.v4();
@@ -96,14 +93,14 @@ class BookService {
       await supabase.from('books').insert({
         'id': internalId,  // Internal UUID for relationships
         'custom_id': bookId,  // Custom ID for display (BWB-001)
-        'title': title,
-        'author_id': authorId,
+        'book_name': bookName,
+        'author_name': authorName,
         'description': description,
         'cover_url': coverUrl,
         'ebook_url': ebookUrl,
-        'is_ebook': isEbook,
         'total_copies': totalCopies,
         'available_copies': availableCopies,
+        'is_ebook': ebookUrl != null, // Set is_ebook based on whether there's an ebook URL
       });
       
       return {
@@ -126,14 +123,14 @@ class BookService {
       // Check if book exists and get its details
       final bookResponse = await supabase
           .from('books')
-          .select('id, available_copies, title, is_ebook')
+          .select('id, available_copies, book_name, is_ebook')
           .eq('custom_id', bookId)  // Use custom_id instead of id
           .single();
       
       final String internalBookId = bookResponse['id'];
       final bool isEbook = bookResponse['is_ebook'] as bool;
       final int availableCopies = bookResponse['available_copies'] as int;
-      final String bookTitle = bookResponse['title'] as String;
+      final String bookTitle = bookResponse['book_name'] as String;
       
       // For e-books, we don't need to check or update availability
       // For physical books, we need to check if copies are available
@@ -185,7 +182,7 @@ class BookService {
       // Get transaction details
       final transactionResponse = await supabase
           .from('book_transactions')
-          .select('book_id, status, is_ebook, books(title, custom_id)')
+          .select('book_id, status, is_ebook, books(book_name, custom_id)')
           .eq('id', transactionId)
           .single();
       
@@ -205,7 +202,7 @@ class BookService {
       }
       
       final bookId = transactionResponse['books']['custom_id'] as String;
-      final bookTitle = transactionResponse['books']['title'] as String;
+      final bookTitle = transactionResponse['books']['book_name'] as String;
       
       // Get current available copies
       final bookResponse = await supabase
@@ -306,9 +303,9 @@ class BookService {
     try {
       final response = await supabase
           .from('books')
-          .select('*, authors(*)')
-          .or('title.ilike.%$query%,description.ilike.%$query%')
-          .order('title');
+          .select('*')
+          .or('book_name.ilike.%$query%,description.ilike.%$query%')
+          .order('book_name');
       
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
