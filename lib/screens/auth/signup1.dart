@@ -112,7 +112,7 @@ class _Signup extends State<Signup1> {
                                 const SizedBox(height: 8),
                                 TextFormField(
                                   onChanged: (value) {
-                                    signupController.name.value = value;
+                                    signupController.name.value = value.trim();
                                   },
                                   decoration: InputDecoration(
                                     hintText: "Enter your full name",
@@ -153,7 +153,7 @@ class _Signup extends State<Signup1> {
                                 const SizedBox(height: 8),
                                 TextFormField(
                                   onChanged: (value) {
-                                    signupController.username.value = value;
+                                    signupController.username.value = value.trim();
                                   },
                                   decoration: InputDecoration(
                                     hintText: "Create a username",
@@ -201,7 +201,7 @@ class _Signup extends State<Signup1> {
                                 const SizedBox(height: 8),
                                 TextFormField(
                                   onChanged: (value) {
-                                    signupController.mobileNumber.value = value;
+                                    signupController.mobileNumber.value = value.trim();
                                   },
                                   keyboardType: TextInputType.phone,
                                   decoration: InputDecoration(

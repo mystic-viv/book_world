@@ -136,9 +136,7 @@ class _Signup2 extends State<Signup2> {
                                       child: TextFormField(
                                         onChanged:
                                             (value) =>
-                                                signupController.dateOfBirth(
-                                                  value as DateTime?,
-                                                ),
+                                                signupController.dateOfBirth.value,
                                         controller: datePicker,
                                         decoration: InputDecoration(
                                           hintText:
@@ -235,7 +233,7 @@ class _Signup2 extends State<Signup2> {
                                   onChanged:
                                       (value) =>
                                           signupController.localAddress.value =
-                                              value,
+                                              value.trim(),
                                   maxLines: 3,
                                   decoration: InputDecoration(
                                     hintText: "Enter your local address",
@@ -333,7 +331,7 @@ class _Signup2 extends State<Signup2> {
                                       (value) =>
                                           signupController
                                               .permanentAddress
-                                              .value = value,
+                                              .value = value.trim(),
                                   maxLines: 3,
                                   decoration: InputDecoration(
                                     hintText: "Enter your permanent address",

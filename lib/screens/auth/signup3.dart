@@ -125,7 +125,7 @@ class _Signup3 extends State<Signup3> {
                                 // Email field
                                 TextFormField(
                                   onChanged: (value) {
-                                    signupController.email.value = value;
+                                    signupController.email.value = value.trim();
                                   },
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(

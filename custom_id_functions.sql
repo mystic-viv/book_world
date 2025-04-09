@@ -3,6 +3,12 @@ CREATE SEQUENCE IF NOT EXISTS user_id_seq START WITH 1;
 CREATE SEQUENCE IF NOT EXISTS librarian_id_seq START WITH 1;
 CREATE SEQUENCE IF NOT EXISTS book_id_seq START WITH 1;
 
+-- Reset the sequences for custom IDs
+-- This is useful for development or testing purposes
+ALTER SEQUENCE user_id_seq RESTART WITH 1;
+ALTER SEQUENCE librarian_id_seq RESTART WITH 1;
+ALTER SEQUENCE book_id_seq RESTART WITH 1;
+
 -- Function for generating user custom IDs (BWU-001)
 CREATE OR REPLACE FUNCTION generate_user_custom_id()
 RETURNS TRIGGER AS $$
