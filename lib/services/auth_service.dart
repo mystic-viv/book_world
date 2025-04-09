@@ -58,29 +58,30 @@ class AuthService {
           //Converting date of birth format
           final formattedDate = DateFormat('yyyy-MM-dd').format(dateOfBirth);
 
-          // Insert user data into the 'users' table
-          await client!.from('users').insert({
-            'id': response.user!.id,
-            'email': email,
-            'username': username,
-            'name': name,
-            'mobile': mobileNumber,
-            'date_of_birth': formattedDate,
-            'local_address': localAddress,
-            'permanent_address': permanentAddress,
-            'role': 'user',
-          }).single();
-
-          // Wait a moment for the custom_id trigger to complete
-          await Future.delayed(Duration(milliseconds: 500));
-
           try {
+            // Insert user data into the 'users' table with custom_id explicitly set to null
+            await client!.from('users').insert({
+              'id': response.user!.id,
+              'email': email,
+              'username': username,
+              'name': name,
+              'mobile': mobileNumber,
+              'date_of_birth': formattedDate,
+              'local_address': localAddress,
+              'permanent_address': permanentAddress,
+              'role': 'user',
+              'custom_id': null, // Explicitly set to null to trigger generation
+            }).single();
+
+            // Wait a moment for the custom_id trigger to complete
+            await Future.delayed(Duration(milliseconds: 500));
+
             // Fetch the generated custom_id
             final userData = await client!
                 .from('users')
                 .select('custom_id, role')
                 .eq('id', response.user!.id)
-                .maybeSingle(); // Use maybeSingle() instead of single()
+                .maybeSingle();
 
             if (userData != null) {
               StorageServices.setUserSession({
@@ -94,9 +95,9 @@ class AuthService {
               });
             } else {
               print("Warning: User data not found after creation");
-              // Set session with available data
               StorageServices.setUserSession({
                 'id': response.user!.id,
+                'custom_id': 'pending',
                 'email': response.user!.email,
                 'username': username,
                 'name': name,
@@ -105,10 +106,10 @@ class AuthService {
               });
             }
           } catch (e) {
-            print("Error fetching user data: $e");
-            // Set session with available data
+            print("Error creating user profile: $e");
             StorageServices.setUserSession({
               'id': response.user!.id,
+              'custom_id': 'pending',
               'email': response.user!.email,
               'username': username,
               'name': name,
