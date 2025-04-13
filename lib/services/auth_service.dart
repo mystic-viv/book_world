@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class AuthService {
   // Get the Supabase client instance
   static final client = SupabaseService.client;
-  
+
   // Sign up a new user
   static Future<AuthResponse> signUp({
     required String email,
@@ -232,24 +232,57 @@ class AuthService {
     try {
       final user = session.user;
 
-      // Fetch user data from users table
+      // First check if this is a librarian
+      final librarianData =
+          await client!
+              .from('librarians')
+              .select('custom_id, name, library_branch')
+              .eq('id', user.id)
+              .maybeSingle(); // Use maybeSingle instead of single
+
+      if (librarianData != null) {
+        // This is a librarian
+        StorageServices.setUserSession({
+          'id': user.id,
+          'custom_id': librarianData['custom_id'],
+          'email': user.email,
+          'name': librarianData['name'],
+          'role': 'librarian',
+          'library_branch': librarianData['library_branch'],
+          'token': session.accessToken,
+        });
+        return;
+      }
+
+      // If not a librarian, check regular users
       final userData =
           await client!
               .from('users')
               .select('custom_id, role, username, name')
               .eq('id', user.id)
-              .single();
+              .maybeSingle(); // Use maybeSingle instead of single
 
-      // Update session data
-      StorageServices.setUserSession({
-        'id': user.id,
-        'custom_id': userData['custom_id'],
-        'email': user.email,
-        'username': userData['username'],
-        'name': userData['name'],
-        'role': userData['role'],
-        'token': session.accessToken,
-      });
+      if (userData != null) {
+        // Regular user found
+        StorageServices.setUserSession({
+          'id': user.id,
+          'custom_id': userData['custom_id'],
+          'email': user.email,
+          'username': userData['username'],
+          'name': userData['name'],
+          'role': userData['role'],
+          'token': session.accessToken,
+        });
+      } else {
+        // No user record found - store minimal session data
+        print("Warning: No user record found for ID: ${user.id}");
+        StorageServices.setUserSession({
+          'id': user.id,
+          'email': user.email,
+          'role': 'guest',
+          'token': session.accessToken,
+        });
+      }
     } catch (e) {
       print("Error refreshing session: $e");
     }
@@ -259,7 +292,7 @@ class AuthService {
   static Map<String, dynamic>? getUserSession() {
     return StorageServices.userSession;
   }
-  
+
   // Check if an email is registered as a librarian
   static Future<bool> isRegisteredLibrarian(String email) async {
     if (client == null) {
@@ -280,7 +313,7 @@ class AuthService {
       return false;
     }
   }
-  
+
   // Librarian signup with email and password
   static Future<AuthResponse> librarianSignUp({
     required String email,
@@ -289,45 +322,51 @@ class AuthService {
     if (client == null) {
       throw Exception("Supabase client is not initialized");
     }
-    
+
     try {
       // Check if email exists in librarians table
-      final librarianData = await client!
-          .from('librarians')
-          .select('email, name, custom_id, library_branch')
-          .eq('email', email)
-          .maybeSingle();
-      
+      final librarianData =
+          await client!
+              .from('librarians')
+              .select('email, name, custom_id, library_branch')
+              .eq('email', email)
+              .maybeSingle();
+
       if (librarianData == null) {
-        throw Exception("Email not found in librarian records");
+        throw Exception("You are not registered as a librarian");
       }
-      
+
       // Check if email already exists in auth users
-      final existingUser = await client!
-          .from('users')
-          .select('email')
-          .eq('email', email)
-          .maybeSingle();
-      
+      final existingUser =
+          await client!
+              .from('users')
+              .select('email')
+              .eq('email', email)
+              .maybeSingle();
+
       if (existingUser != null) {
         throw Exception("Account already exists. Please login instead.");
       }
-      
+
       // Call Supabase signup API
       final AuthResponse response = await client!.auth.signUp(
         email: email,
         password: password,
         data: {'role': 'librarian'},
       );
-      
+
       // If signup successful, update librarian record
       if (response.user != null) {
         try {
           // Update the librarian record with auth user ID
-          await client!.from('librarians')
-              .update({'id': response.user!.id})
-              .eq('email', email);
-          
+          await client!.rpc(
+            'link_librarian_to_auth_user',
+            params: {
+              'auth_user_id': response.user!.id,
+              'librarian_email': email,
+            },
+          );
+
           // Store session data
           StorageServices.setUserSession({
             'id': response.user!.id,
@@ -350,7 +389,7 @@ class AuthService {
           });
         }
       }
-      
+
       return response;
     } catch (e) {
       print("Error during librarian signup: $e");

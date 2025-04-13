@@ -210,18 +210,6 @@ class AccountScreen extends StatelessWidget {
                     null,
                   ),
                   _buildMenuItem(context, 'Log Out', Icons.logout, null),
-                  /* ListTile(
-                    leading: const Icon(Icons.logout, color: Colors.orange),
-                    title: const Text(
-                      'Log Out',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    trailing: const Icon(
-                      Icons.chevron_right,
-                      color: Colors.orange,
-                    ),
-                  ),
-                  */
                 ],
               ),
             ),

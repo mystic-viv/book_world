@@ -1,7 +1,6 @@
+import 'package:book_world/routes/route_names.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/librarians/librarian_home_screen.dart';
-import 'package:book_world/screens/librarians/add_book_screen.dart';
-import 'package:book_world/screens/librarians/issue_return_screen.dart';
+import 'package:get/get.dart';
 
 class StudentInfo {
   final String id;
@@ -241,36 +240,15 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LibrarianHomeScreen(),
-                    ),
-                  );
-                },
+                onTap: () => Get.offAllNamed(RouteNames.librarianHome),
                 child: _buildNavItem(icon: Icons.home, label: 'Home'),
               ),
               GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddBookScreen(),
-                    ),
-                  );
-                },
+                onTap: () => Get.toNamed(RouteNames.addBook),
                 child: _buildNavItem(icon: Icons.add_box, label: 'Add Book'),
               ),
               GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const IssueReturnScreen(),
-                    ),
-                  );
-                },
+                onTap: () =>  Get.toNamed(RouteNames.issueReturnBook),
                 child: _buildNavItem(
                   icon: Icons.swap_horiz,
                   label: 'Issue/Return',

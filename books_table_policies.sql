@@ -3,7 +3,7 @@ ALTER TABLE public.books ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "All users can view books" 
 ON "public"."books"
 FOR SELECT
-USING (auth.role() != 'anon');
+USING (true);
 
 CREATE POLICY "Only librarians and admins can add books" 
 ON "public"."books"
@@ -25,12 +25,12 @@ USING (
   )
 );
 
-CREATE POLICY "Only admins can delete books" 
+CREATE POLICY "Only admins and librarians can delete books" 
 ON "public"."books"
 FOR DELETE
 USING (
   EXISTS (
     SELECT 1 FROM users
-    WHERE users.id = auth.uid() AND users.role = 'admin'
+    WHERE users.id = auth.uid() AND (users.role = 'admin' OR users.role = 'librarian')
   )
 );

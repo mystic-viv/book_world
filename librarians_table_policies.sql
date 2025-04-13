@@ -6,6 +6,12 @@ ON "public"."librarians"
 FOR SELECT
 USING (true);
 
+-- Allow updates to the librarians table when the email matches
+CREATE POLICY "Users can update their own librarian record" 
+ON public.librarians
+FOR UPDATE
+USING (auth.email() = email);
+
 -- Librarians can read their own profile
 CREATE POLICY "Librarians can read their own profile"
 ON "public"."librarians"
@@ -21,19 +27,6 @@ ON "public"."librarians"
 FOR UPDATE
 USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
-
--- System can update id during signup
-CREATE POLICY "Allow id update during signup"
-ON "public"."librarians"
-FOR UPDATE
-USING (
-  -- Allow updating when email matches the authenticated user's email
-  email = (SELECT email FROM auth.users WHERE id = auth.uid())
-)
-WITH CHECK (
-  -- Only allow updating the id to the current user's ID
-  id = auth.uid()
-);
 
 -- Admins can manage all librarian records
 CREATE POLICY "Admins can manage librarians" 

@@ -1,8 +1,10 @@
+import 'package:book_world/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:book_world/screens/librarians/librarian_home_screen.dart';
 import 'package:book_world/screens/librarians/add_book_screen.dart';
 import 'package:book_world/screens/librarians/issue_return_screen.dart';
 import 'package:book_world/screens/librarians/all_users_screen.dart';
+import 'package:get/get.dart';
 
 class BookInfo {
   final String id;
@@ -256,16 +258,16 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
               GestureDetector(
                 onTap:
                     () =>
-                        _navigateToScreen(context, const LibrarianHomeScreen()),
+                        Get.offAllNamed(RouteNames.librarianHome),
                 child: _buildNavItem(icon: Icons.home, label: 'Home'),
               ),
               GestureDetector(
-                onTap: () => _navigateToScreen(context, const AddBookScreen()),
+                onTap: () => Get.toNamed(RouteNames.addBook),
                 child: _buildNavItem(icon: Icons.add_box, label: 'Add Book'),
               ),
               GestureDetector(
                 onTap:
-                    () => _navigateToScreen(context, const IssueReturnScreen()),
+                    () => Get.toNamed(RouteNames.issueReturnBook),
                 child: _buildNavItem(
                   icon: Icons.swap_horiz,
                   label: 'Issue/Return',
@@ -273,7 +275,7 @@ class _AllBooksScreenState extends State<AllBooksScreen> {
               ),
               GestureDetector(
                 onTap:
-                    () => _navigateToScreen(context, const AllUsersScreen()),
+                    () => Get.toNamed(RouteNames.allUsers),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],

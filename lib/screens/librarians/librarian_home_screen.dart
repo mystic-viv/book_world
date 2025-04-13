@@ -1,18 +1,11 @@
+import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/services/storage_service.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/librarians/add_book_screen.dart';
-import 'package:book_world/screens/librarians/issue_return_screen.dart';
-import 'package:book_world/screens/librarians/all_users_screen.dart';
-import 'package:book_world/screens/librarians/all_books_screen.dart';
+
+import 'package:get/get.dart';
 
 class LibrarianHomeScreen extends StatelessWidget {
   const LibrarianHomeScreen({super.key});
-
-  void _navigateToScreen(BuildContext context, Widget screen) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-    );
-  }
 
   Widget _buildMenuItem({
     required String title,
@@ -41,6 +34,43 @@ class LibrarianHomeScreen extends StatelessWidget {
     );
   }
 
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Log Out",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text("Are you sure you want to log out?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.green),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog
+                Navigator.of(context).pop();
+
+                // Use a simpler approach that doesn't depend on Supabase
+                StorageServices.clearAll();
+
+                // Navigate to login screen
+                Get.offAllNamed(RouteNames.login);
+              },
+              child: const Text("Log Out", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +82,7 @@ class LibrarianHomeScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(left: 16, top: 60),
               child: Text(
-                'Hello! Admin',
+                'Hello! Librarian',
                 style: TextStyle(
                   color: Colors.orange,
                   fontSize: 24,
@@ -112,14 +142,7 @@ class LibrarianHomeScreen extends StatelessWidget {
                   _buildMenuItem(
                     title: 'All Books in Library',
                     icon: Icons.library_books,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AllBooksScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => Get.toNamed(RouteNames.allBooks),
                   ),
                   _buildMenuItem(
                     title: 'All Issued Books',
@@ -139,7 +162,7 @@ class LibrarianHomeScreen extends StatelessWidget {
                   _buildMenuItem(
                     title: 'Log Out',
                     icon: Icons.logout,
-                    onTap: () {},
+                    onTap: () {_confirmLogout(context);},
                   ),
                 ],
               ),
@@ -165,20 +188,18 @@ class LibrarianHomeScreen extends StatelessWidget {
             children: [
               _buildNavItem(icon: Icons.home, label: 'Home', isSelected: true),
               GestureDetector(
-                onTap: () => _navigateToScreen(context, const AddBookScreen()),
+                onTap: () => Get.toNamed(RouteNames.addBook),
                 child: _buildNavItem(icon: Icons.add_box, label: 'Add Book'),
               ),
               GestureDetector(
-                onTap:
-                    () => _navigateToScreen(context, const IssueReturnScreen()),
+                onTap: () => Get.toNamed(RouteNames.issueReturnBook),
                 child: _buildNavItem(
                   icon: Icons.swap_horiz,
                   label: 'Issue/Return',
                 ),
               ),
               GestureDetector(
-                onTap:
-                    () => _navigateToScreen(context, const AllUsersScreen()),
+                onTap: () => Get.toNamed(RouteNames.allUsers),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],
@@ -187,7 +208,6 @@ class LibrarianHomeScreen extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildNavItem({
     required IconData icon,
     required String label,

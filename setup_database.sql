@@ -17,9 +17,9 @@ CREATE TABLE users (
 
 -- Creating Librarians Table
 CREATE TABLE librarians (
-  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  id UUID REFERENCES auth.users(id),
   custom_id TEXT UNIQUE,
-  email TEXT NOT NULL UNIQUE,
+  email TEXT NOT NULL UNIQUE PRIMARY KEY,
   name TEXT,
   mobile TEXT UNIQUE,
   date_of_birth TIMESTAMP,

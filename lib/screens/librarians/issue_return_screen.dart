@@ -1,8 +1,8 @@
+import 'package:book_world/routes/route_names.dart';
 import 'package:flutter/material.dart';
-import 'package:book_world/screens/librarians/librarian_home_screen.dart';
-import 'package:book_world/screens/librarians/add_book_screen.dart';
-import 'package:book_world/screens/librarians/all_users_screen.dart';
 import 'dart:ui';
+
+import 'package:get/get.dart';
 
 class IssueReturnScreen extends StatefulWidget {
   const IssueReturnScreen({super.key});
@@ -207,11 +207,11 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
               GestureDetector(
                 onTap:
                     () =>
-                        _navigateToScreen(context, const LibrarianHomeScreen()),
+                        Get.offAllNamed(RouteNames.librarianHome),
                 child: _buildNavItem(icon: Icons.home, label: 'Home'),
               ),
               GestureDetector(
-                onTap: () => _navigateToScreen(context, const AddBookScreen()),
+                onTap: () => Get.toNamed(RouteNames.addBook),
                 child: _buildNavItem(icon: Icons.add_box, label: 'Add Book'),
               ),
               _buildNavItem(
@@ -221,7 +221,7 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
               ),
               GestureDetector(
                 onTap:
-                    () => _navigateToScreen(context, const AllUsersScreen()),
+                    () => Get.toNamed(RouteNames.allBooks),
                 child: _buildNavItem(icon: Icons.people, label: 'All Students'),
               ),
             ],
@@ -251,7 +251,4 @@ class _IssueReturnScreenState extends State<IssueReturnScreen> {
     );
   }
 
-  void _navigateToScreen(BuildContext context, Widget screen) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
-  }
 }
