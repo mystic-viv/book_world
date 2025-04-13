@@ -284,25 +284,15 @@ class _Login extends State<Login> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Get.toNamed(RouteNames.adminLogin);
-                                      },
-                                      child: const Text(
-                                        "Admin Login",
-                                        style: TextStyle(
-                                          color: Color(0xFFE97F11),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
                                     const SizedBox(width: 20),
                                     TextButton(
                                       onPressed: () {
-                                        Get.toNamed(RouteNames.librarianLogin);
+                                        Get.toNamed(
+                                          RouteNames.librarianEmailVerification,
+                                        );
                                       },
                                       child: const Text(
-                                        "Librarian Login",
+                                        "Registered Librarian Signup",
                                         style: TextStyle(
                                           color: Color(0xFFE97F11),
                                           fontWeight: FontWeight.bold,

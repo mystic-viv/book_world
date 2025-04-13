@@ -23,6 +23,8 @@ class AuthController extends GetxController {
   var password = ''.obs;
   var signupLoading = false.obs;
   var loginLoading = false.obs;
+  var librarianSignupLoading = false.obs;
+  var librarianCheckLoading = false.obs;
 
   @override
   void onInit() {
@@ -30,6 +32,8 @@ class AuthController extends GetxController {
     // Reset loading states
     signupLoading.value = false;
     loginLoading.value = false;
+    librarianSignupLoading.value = false;
+    librarianCheckLoading.value = false;
   }
 
   @override
@@ -37,6 +41,8 @@ class AuthController extends GetxController {
     // Cancel any ongoing operations
     signupLoading.value = false;
     loginLoading.value = false;
+    librarianSignupLoading.value = false;
+    librarianCheckLoading.value = false;
     super.onClose();
   }
 
@@ -101,7 +107,7 @@ class AuthController extends GetxController {
         // Check user role and navigate accordingly
         final userRole = AuthService.getUserRole();
         if (userRole == 'librarian') {
-          //Get.offAllNamed(RouteNames.librarianHome);
+          Get.offAllNamed(RouteNames.librarianHome);
         } else {
           Get.offAllNamed(RouteNames.home);
         }
@@ -133,6 +139,56 @@ class AuthController extends GetxController {
     }
   }
 
+  // * Check if email is registered as librarian
+  Future<bool> checkLibrarianEmail(String email) async {
+    try {
+      librarianCheckLoading.value = true;
+      final isLibrarian = await AuthService.isRegisteredLibrarian(email);
+      librarianCheckLoading.value = false;
+      
+      if (!isLibrarian) {
+        showSnackBar("Error", "Email not found in librarian records");
+      }
+      
+      return isLibrarian;
+    } catch (error) {
+      librarianCheckLoading.value = false;
+      print("Librarian check error: $error");
+      showSnackBar("Error", "Failed to verify librarian status");
+      return false;
+    }
+  }
+
+  // * Librarian Signup Function
+  Future<void> librarianSignup(String email, String password) async {
+    try {
+      librarianSignupLoading.value = true;
+
+      // Use the AuthService for librarian signup
+      final AuthResponse response = await AuthService.librarianSignUp(
+        email: email,
+        password: password,
+      );
+
+      librarianSignupLoading.value = false;
+      
+      if (response.user != null) {
+        showSnackBar("Success", "Librarian account created successfully!");
+        Get.offAllNamed(RouteNames.librarianHome); // Navigate to librarian dashboard
+      }
+    } on AuthException catch (error) {
+      librarianSignupLoading.value = false;
+      showSnackBar("Error", error.message); // Show error message
+    } catch (error) {
+      librarianSignupLoading.value = false;
+      print("Librarian signup error: $error");
+      showSnackBar(
+        "Error",
+        "Something went wrong. Please try again.",
+      ); // Handle unexpected errors
+    }
+  }
+
   // * Check if user is authenticated
   bool isAuthenticated() {
     return AuthService.isAuthenticated();
@@ -143,14 +199,9 @@ class AuthController extends GetxController {
     return AuthService.getUserRole();
   }
 
-  // * Check if user is admin
-  bool isAdmin() {
-    return AuthService.isAdmin();
-  }
-
   // * Check if user is librarian
   bool isLibrarian() {
-    return AuthService.isLibrarian();
+    return AuthService.getUserRole() == 'librarian';
   }
 
   // * Get user custom ID
@@ -158,5 +209,4 @@ class AuthController extends GetxController {
     final session = StorageServices.userSession;
     return session != null ? session['custom_id'] : null;
   }
-
 }

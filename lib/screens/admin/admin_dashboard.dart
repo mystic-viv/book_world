@@ -106,7 +106,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE97F11).withOpacity(0.1),
+                  color: const Color(0xFFE97F11).withAlpha(26),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(

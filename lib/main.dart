@@ -64,10 +64,6 @@ class BookWorldApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Check session state
-    final userSession = StorageServices.userSession;
-    debugPrint("User session: $userSession");
-
     // Determine initial route based on session
     String initialRoute = RouteNames.splash;
 
