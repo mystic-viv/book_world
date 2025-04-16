@@ -1,5 +1,11 @@
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
+-- Enable read access for all users to login
+CREATE POLICY "Allow username lookup for login"
+ON public.users
+FOR SELECT
+USING (true);
+
 -- Allow anyone to create a user during signup
 CREATE POLICY "Allow user creation during signup" 
 ON "public"."users"

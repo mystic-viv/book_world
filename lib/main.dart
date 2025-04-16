@@ -18,7 +18,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment variables
+  // Load environment variables from .env file
   await dotenv.load(fileName: ".env");
 
   // Initialize Supabase
@@ -32,14 +32,17 @@ void main() async {
     final AuthChangeEvent event = data.event;
 
     if (event == AuthChangeEvent.signedOut) {
-      // User signed out, redirect to login
+       // User signed out, redirect to login screen
       Get.offAllNamed(RouteNames.login);
     } else if (event == AuthChangeEvent.signedIn) {
       // User signed in, update session
       if (data.session != null) {
-        // Refresh user session data
+         // Refresh user session data
         AuthService.refreshSession(data.session!);
       }
+    } else if (event == AuthChangeEvent.passwordRecovery) {
+      // Handle password recovery event
+      Get.toNamed(RouteNames.resetPasswordConfirm);
     }
   });
 
@@ -59,12 +62,12 @@ void main() async {
   runApp(const BookWorldApp());
 }
 
+
 class BookWorldApp extends StatelessWidget {
   const BookWorldApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Determine initial route based on session
     String initialRoute = RouteNames.splash;
 
     return GetMaterialApp(
@@ -77,8 +80,6 @@ class BookWorldApp extends StatelessWidget {
     );
   }
 }
-
-// Simple error boundary widget
 class ErrorBoundary extends StatefulWidget {
   final Widget child;
 
@@ -94,7 +95,6 @@ class ErrorBoundaryState extends State<ErrorBoundary> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Reset error state on hot reload
     hasError = false;
   }
 

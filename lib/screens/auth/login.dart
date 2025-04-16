@@ -105,7 +105,7 @@ class _Login extends State<Login> {
                                 TextFormField(
                                   controller: _usernameController,
                                   decoration: InputDecoration(
-                                    hintText: "Enter username or Email",
+                                    hintText: "Enter email or username",
                                     prefixIcon: const Icon(
                                       Icons.person,
                                       color: Colors.orange,
@@ -196,7 +196,7 @@ class _Login extends State<Login> {
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
                                     onPressed: () {
-                                      // Add forgot password functionality
+                                      Get.toNamed(RouteNames.forgotPassword);
                                     },
                                     child: const Text(
                                       "Forgot Password?",

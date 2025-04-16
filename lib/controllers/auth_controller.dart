@@ -90,39 +90,37 @@ class AuthController extends GetxController {
       ); // Handle unexpected errors
     }
   }
+    // * Login Function
+    Future<void> login(String input, String password) async {
+      try {
+        loginLoading.value = true;
 
-  // * Login Function
-  Future<void> login(String input, String password) async {
-    try {
-      loginLoading.value = true;
-
-      // Use the AuthService for login
-      final AuthResponse response = await AuthService.login(input, password);
+        // Use the AuthService for login
+        final AuthResponse response = await AuthService.login(input, password);
       
-      loginLoading.value = false;
+        loginLoading.value = false;
 
-      if (response.user != null) {
-        showSnackBar("Success", "Logged in successfully!");
+        if (response.user != null) {
+          showSnackBar("Success", "Logged in successfully!");
         
-        // Check user role and navigate accordingly
-        final userRole = AuthService.getUserRole();
-        if (userRole == 'librarian') {
-          Get.offAllNamed(RouteNames.librarianHome);
-        } else {
-          Get.offAllNamed(RouteNames.home);
+          // Check user role and navigate accordingly
+          final userRole = AuthService.getUserRole();
+          if (userRole == 'librarian') {
+            Get.offAllNamed(RouteNames.librarianHome);
+          } else {
+            Get.offAllNamed(RouteNames.home);
+          }
         }
+      } on AuthException catch (error) {
+        loginLoading.value = false;
+        print("AuthException: ${error.message}");
+        showSnackBar("Error", error.message);
+      } catch (error) {
+        loginLoading.value = false;
+        print("Login error: $error");
+        showSnackBar("Error", "Something went wrong. Please try again.");
       }
-    } on AuthException catch (error) {
-      loginLoading.value = false;
-      print("AuthException: ${error.message}");
-      showSnackBar("Error", error.message);
-    } catch (error) {
-      loginLoading.value = false;
-      print("Login error: $error");
-      showSnackBar("Error", "Something went wrong. Please try again.");
     }
-  }
-
   // * Logout Function
   Future<void> logout() async {
     try {
@@ -209,4 +207,55 @@ class AuthController extends GetxController {
     final session = StorageServices.userSession;
     return session != null ? session['custom_id'] : null;
   }
-}
+
+  
+    // * Reset Password Function
+
+    // Add this RxBool for loading state
+    var resetPasswordLoading = false.obs;
+    var confirmResetLoading = false.obs;
+
+    // Add this method to handle password reset
+    Future<void> resetPassword(String email) async {
+      try {
+        resetPasswordLoading.value = true;
+      
+        // Call the AuthService to handle the password reset
+        await AuthService.resetPassword(email);
+      
+        resetPasswordLoading.value = false;
+      
+        // Show success message
+        showSnackBar("Success", "Password reset link has been sent to your email");
+      
+        // Navigate back to login screen
+        Get.back();
+      } catch (error) {
+        resetPasswordLoading.value = false;
+        print("Password reset error: $error");
+        showSnackBar("Error", "Failed to send password reset email. Please try again.");
+      }
+    }
+
+    // Add this method to handle password reset confirmation
+    Future<void> confirmPasswordReset(String newPassword) async {
+      try {
+        confirmResetLoading.value = true;
+      
+        // Call the AuthService to update the password
+        await AuthService.confirmPasswordReset(newPassword);
+      
+        confirmResetLoading.value = false;
+      
+        // Show success message
+        showSnackBar("Success", "Your password has been reset successfully");
+      
+        // Navigate to login screen
+        Get.offAllNamed(RouteNames.login);
+      } catch (error) {
+        confirmResetLoading.value = false;
+        print("Password reset confirmation error: $error");
+        showSnackBar("Error", "Failed to reset password. Please try again.");
+      }
+    }
+  }

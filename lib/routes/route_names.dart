@@ -28,4 +28,6 @@ class RouteNames {
   static const String bookTransactions = '/bookTransactions';
   static const String librarianEmailVerification = '/librarian-email-verification';
   static const String librarianSignupPassword = '/librarian-signup-password';
+  static const String forgotPassword = '/forgot-password';
+  static const String resetPasswordConfirm = '/reset-password-confirm';
 }

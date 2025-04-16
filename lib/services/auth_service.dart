@@ -135,9 +135,9 @@ class AuthService {
     }
 
     String email = input; // Default to input being an email
-
+    bool isEmail = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(input);
     // Check if the input is not an email (assume it's a username)
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}').hasMatch(input)) {
+    if (!isEmail) {
       print(
         "Input is not an email, attempting to fetch email for username: $input",
       );
@@ -147,10 +147,11 @@ class AuthService {
           await client!
               .from('users')
               .select('email')
-              .filter('username', 'eq', input)
+              .eq('username', input.trim())
               .maybeSingle();
 
       if (response == null || response['email'] == null) {
+        print("No email found for username: $input");
         throw AuthException('Invalid username or email address');
       }
 
@@ -167,24 +168,57 @@ class AuthService {
 
     // If login successful, store user session
     if (response.user != null) {
-      // Fetch user data from the database
+      // First check if this is a librarian
+      final librarianData =
+          await client!
+              .from('librarians')
+              .select('custom_id, name, library_branch')
+              .eq('id', response.user!.id)
+              .maybeSingle();
+
+      if (librarianData != null) {
+        // This is a librarian
+        StorageServices.setUserSession({
+          'id': response.user!.id,
+          'custom_id': librarianData['custom_id'],
+          'email': response.user!.email,
+          'name': librarianData['name'],
+          'role': 'librarian',
+          'library_branch': librarianData['library_branch'],
+          'token': response.session?.accessToken,
+        });
+        return response;
+      }
+
+      // If not a librarian, check regular users
       final userData =
           await client!
               .from('users')
               .select('custom_id, role, username, name')
               .eq('id', response.user!.id)
-              .single();
+              .maybeSingle();
 
-      // Store user session data
-      StorageServices.setUserSession({
-        'id': response.user!.id,
-        'custom_id': userData['custom_id'],
-        'email': response.user!.email,
-        'username': userData['username'],
-        'name': userData['name'],
-        'role': userData['role'],
-        'token': response.session?.accessToken,
-      });
+      if (userData != null) {
+        // Store user session data
+        StorageServices.setUserSession({
+          'id': response.user!.id,
+          'custom_id': userData['custom_id'],
+          'email': response.user!.email,
+          'username': userData['username'],
+          'name': userData['name'],
+          'role': userData['role'],
+          'token': response.session?.accessToken,
+        });
+      } else {
+        // No user record found - store minimal session data
+        print("Warning: No user record found for ID: ${response.user!.id}");
+        StorageServices.setUserSession({
+          'id': response.user!.id,
+          'email': response.user!.email,
+          'role': 'guest',
+          'token': response.session?.accessToken,
+        });
+      }
     }
 
     return response;
@@ -394,6 +428,35 @@ class AuthService {
     } catch (e) {
       print("Error during librarian signup: $e");
       rethrow;
+    }
+  }
+
+  // * Reset Password
+
+  static Future<void> resetPassword(String email) async {
+    try {
+      // Using Supabase to send password reset email
+      await Supabase.instance.client.auth.resetPasswordForEmail(
+        email,
+        redirectTo:
+            'io.supabase.book_world://reset_password-callback/', // Replace with your app's deep link
+      );
+    } catch (error) {
+      print("AuthService resetPassword error: $error");
+      rethrow; // Rethrow to be caught by the controller
+    }
+  }
+
+  // Add this method to your AuthService class
+  static Future<void> confirmPasswordReset(String newPassword) async {
+    try {
+      // Update the user's password using Supabase
+      await Supabase.instance.client.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+    } catch (error) {
+      print("AuthService confirmPasswordReset error: $error");
+      rethrow; // Rethrow to be caught by the controller
     }
   }
 }

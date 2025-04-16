@@ -5,8 +5,10 @@ import 'package:book_world/screens/Users/account_screen.dart';
 import 'package:book_world/screens/Users/borrowed_books_screen.dart';
 import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:book_world/screens/Users/saved_books_screen.dart';
+import 'package:book_world/screens/auth/forgot_password.dart';
 import 'package:book_world/screens/auth/librarian_email_verification.dart';
 import 'package:book_world/screens/auth/librarian_password_setup.dart';
+import 'package:book_world/screens/auth/reset_password_confirm.dart';
 import 'package:book_world/screens/auth/signup1.dart';
 import 'package:book_world/screens/auth/signup2.dart';
 import 'package:book_world/screens/auth/signup3.dart';
@@ -24,6 +26,8 @@ class Routes {
     // Public routes (no authentication required)
     GetPage(name: RouteNames.splash, page: () => const Splash()),
     GetPage(name: RouteNames.login, page: () => const Login()),
+    GetPage(name: RouteNames.forgotPassword, page: () => const ForgotPassword()),
+    GetPage(name: RouteNames.resetPasswordConfirm, page: () => const ResetPasswordConfirm()),
     GetPage(name: RouteNames.signup1, page: () => const Signup1()),
     GetPage(name: RouteNames.signup2, page: () => const Signup2()),
     GetPage(name: RouteNames.signup3, page: () => const Signup3()),    
