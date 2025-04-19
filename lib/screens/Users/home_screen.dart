@@ -1,6 +1,7 @@
 import 'package:book_world/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'dart:math' show min, max;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -210,8 +211,11 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context,
     List<Map<String, dynamic>> allGenres,
   ) {
-    // Current page state
+    // Define currentPage outside the builder to maintain its state
     int currentPage = 0;
+
+    // Dismiss keyboard when dialog opens
+    FocusManager.instance.primaryFocus?.unfocus();
 
     showDialog(
       context: context,
@@ -219,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             // Calculate how many genres per page
-            // Assuming 3 genres per row and 4 rows per page
+            // Assuming 4 genres per row and 4 rows per page
             final int genresPerRow = 4;
             final int rowsPerPage = 4;
             final int genresPerPage = genresPerRow * rowsPerPage;
@@ -229,7 +233,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Create a page controller for swiping
             final PageController pageController = PageController(
-              initialPage: 0,
+              initialPage: currentPage,
+            );
+
+            // Get available screen height
+            final double screenHeight = MediaQuery.of(context).size.height;
+            final double keyboardHeight =
+                MediaQuery.of(context).viewInsets.bottom;
+            final double availableHeight =
+                screenHeight - keyboardHeight - 200; // Subtract some padding
+
+            // Calculate appropriate height for rows
+            final double rowHeight = 90; // Default height per row
+            final int visibleRows = max(
+              1,
+              min(rowsPerPage, (availableHeight / rowHeight).floor()),
             );
 
             return Dialog(
@@ -239,106 +257,116 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               backgroundColor: const Color(0xFFFFE8C6),
               insetPadding: const EdgeInsets.all(16),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(
-                            left: 17,
-                            top: 10,
-                            bottom: 20,
-                          ),
-                          child: Text(
-                            'All Genres',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange,
+              child: SingleChildScrollView(
+                // Add scrolling capability
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(
+                              left: 17,
+                              top: 10,
+                              bottom: 20,
+                            ),
+                            child: Text(
+                              'All Genres',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: IconButton(
-                            icon: const Icon(Icons.close, color: Colors.orange),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.orange,
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    // PageView for horizontal swiping
-                    SizedBox(
-                      height: rowsPerPage * 90, // Approximate height for 4 rows
-                      child: PageView.builder(
-                        controller: pageController,
-                        itemCount: totalPages,
-                        onPageChanged: (page) {
-                          setState(() {
-                            currentPage = page;
-                          });
-                        },
-                        itemBuilder: (context, pageIndex) {
-                          // Calculate start and end indices for this page
-                          final int startIndex = pageIndex * genresPerPage;
-                          final int endIndex =
-                              (startIndex + genresPerPage) < allGenres.length
-                                  ? startIndex + genresPerPage
-                                  : allGenres.length;
-                    
-                          // Get genres for this page
-                          final List<Map<String, dynamic>> pageGenres =
-                              allGenres.sublist(startIndex, endIndex);
-                    
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Wrap(
-                              spacing: 12,
-                              runSpacing: 12,
-                              alignment: WrapAlignment.center,
-                              children:
-                                  pageGenres
-                                      .map(
-                                        (genre) => _genreItem(
-                                          genre['title'],
-                                          genre['icon'],
-                                        ),
-                                      )
-                                      .toList(),
+                      // PageView for horizontal swiping with adaptive height
+                      SizedBox(
+                        height: visibleRows * rowHeight,
+                        child: PageView.builder(
+                          controller: pageController,
+                          itemCount: totalPages,
+                          onPageChanged: (page) {
+                            setState(() {
+                              currentPage = page;
+                            });
+                          },
+                          itemBuilder: (context, pageIndex) {
+                            // Calculate start and end indices for this page
+                            final int startIndex = pageIndex * genresPerPage;
+                            final int endIndex =
+                                (startIndex + genresPerPage) < allGenres.length
+                                    ? startIndex + genresPerPage
+                                    : allGenres.length;
+
+                            // Get genres for this page
+                            final List<Map<String, dynamic>> pageGenres =
+                                allGenres.sublist(startIndex, endIndex);
+
+                            return SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
+                                  alignment: WrapAlignment.center,
+                                  children:
+                                      pageGenres
+                                          .map(
+                                            (genre) => _genreItem(
+                                              genre['title'],
+                                              genre['icon'],
+                                            ),
+                                          )
+                                          .toList(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      // Page indicator
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(totalPages, (index) {
+                          return Container(
+                            width: 8,
+                            height: 8,
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color:
+                                  currentPage == index
+                                      ? Colors.orange
+                                      : Colors.orange.withAlpha(76),
                             ),
                           );
-                        },
+                        }),
                       ),
-                    ),
-
-                    // Page indicator
-                    //const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(totalPages, (index) {
-                        return Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color:
-                                currentPage == index
-                                    ? Colors.orange
-                                    : Colors.orange.withAlpha(68),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
+                      const SizedBox(height: 8),
+                    ],
+                  ),
                 ),
               ),
             );

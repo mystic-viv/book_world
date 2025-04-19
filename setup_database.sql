@@ -41,7 +41,7 @@ CREATE TABLE books (
   author_name TEXT NOT NULL,
   description TEXT,
   genres TEXT[],
-  physical_copies INTEGER DEFAULT 0,
+  total_copies INTEGER DEFAULT 0,
   available_copies INTEGER DEFAULT 0,
   book_cover_url TEXT,
   book_pdf_url TEXT,
