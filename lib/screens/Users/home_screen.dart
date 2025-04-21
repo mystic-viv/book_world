@@ -1,7 +1,13 @@
 import 'package:book_world/routes/route_names.dart';
+import 'package:book_world/screens/Users/book_description_screen.dart';
+import 'package:book_world/screens/Users/genre_books_screen.dart';
+import 'package:book_world/screens/Users/search_results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'dart:math' show min, max;
+import 'package:book_world/models/book_model.dart';
+import 'package:book_world/services/book_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,10 +18,130 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final BookService _bookService = BookService();
+  final SupabaseClient _supabase = Supabase.instance.client;
+
+  List<BookModel> _recentBooks = [];
+  List<BookModel> _topBooks = [];
+  List<Map<String, dynamic>> _shuffledGenres = [];
+  bool _isLoading = true;
+
+  // List of all available genres with their icons
+  final List<Map<String, dynamic>> allGenres = [
+    {'title': 'Biographies', 'icon': Icons.contact_page},
+    {'title': 'Literature', 'icon': Icons.feed},
+    {'title': 'Engineering', 'icon': Icons.engineering},
+    {'title': 'History', 'icon': Icons.history_edu},
+    {'title': 'Law', 'icon': Icons.gavel},
+    {'title': 'Fantasy', 'icon': Icons.auto_stories},
+    {'title': 'Science', 'icon': Icons.science},
+    {'title': 'Fiction', 'icon': Icons.menu_book},
+    {'title': 'Self-Help', 'icon': Icons.psychology},
+    {'title': 'Business', 'icon': Icons.business},
+    {'title': 'Technology', 'icon': Icons.computer},
+    {'title': 'Art', 'icon': Icons.palette},
+    {'title': 'Poetry', 'icon': Icons.format_quote},
+    {'title': 'Cooking', 'icon': Icons.restaurant},
+    {'title': 'Travel', 'icon': Icons.flight},
+    {'title': 'Sports', 'icon': Icons.sports_soccer},
+    {'title': 'Mystery', 'icon': Icons.search},
+    {'title': 'Romance', 'icon': Icons.favorite},
+    {'title': 'Thriller', 'icon': Icons.bolt},
+    {'title': 'Horror', 'icon': Icons.dark_mode},
+    {'title': 'Comics', 'icon': Icons.photo_album},
+    {'title': 'Religion', 'icon': Icons.church},
+    {'title': 'Philosophy', 'icon': Icons.psychology_alt},
+    {'title': 'Medicine', 'icon': Icons.medical_services},
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBooks();
+    _shuffleGenres();
+  }
+
+  void _shuffleGenres() {
+    // Shuffle the genres list to display them randomly
+    _shuffledGenres = List.from(allGenres)..shuffle();
+  }
+
+  Future<void> _fetchBooks() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Get recently interacted books using BookService
+      final recentlyInteractedBooks = await _bookService
+          .getRecentlyInteractedBooks(limit: 10);
+
+      // Only set _recentBooks if there are actual interactions
+      if (recentlyInteractedBooks.isNotEmpty) {
+        _recentBooks = recentlyInteractedBooks;
+      } else {
+        // Leave _recentBooks as an empty list
+        _recentBooks = [];
+      }
+
+      // Get top explored books based on interaction counts
+      final topExploredBooks = await _bookService.getTopExploredBooks();
+      final topBooks = topExploredBooks;
+
+      setState(() {
+        _topBooks = topBooks.take(min(12, topBooks.length)).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error fetching books: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   void _searchBooks(String query) {
-    // Implement search functionality
-    debugPrint('Searching for: $query');
+    if (query.trim().isEmpty) return;
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => const Center(
+            child: CircularProgressIndicator(color: Colors.orange),
+          ),
+    );
+
+    // Use BookService to search books
+    _bookService
+        .searchBooks(query)
+        .then((searchResults) {
+          // Close loading indicator
+          Navigator.pop(context);
+
+          // Navigate to search results screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) =>
+                      SearchResultsScreen(query: query, results: searchResults),
+            ),
+          );
+        })
+        .catchError((error) {
+          // Close loading indicator
+          Navigator.pop(context);
+
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Search failed: ${error.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
   }
 
   @override
@@ -41,25 +167,36 @@ class _HomeScreenState extends State<HomeScreen> {
         scrolledUnderElevation: 0,
       ),
 
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSearchBar(),
-              const SizedBox(height: 20),
-              _buildGenresSection(),
-              const SizedBox(height: 20),
-              _buildAgeCategories(),
-              const SizedBox(height: 20),
-              _buildRecentlyInteractedBooks(),
-              const SizedBox(height: 20),
-              _buildTopExploredBooks(),
-            ],
-          ),
-        ),
-      ),
+      body:
+          _isLoading
+              ? const Center(
+                child: CircularProgressIndicator(color: Colors.orange),
+              )
+              : GestureDetector(
+                onTap: () {
+                  // Dismiss keyboard when tapping outside of text fields
+                  FocusScope.of(context).unfocus();
+                },
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSearchBar(),
+                        const SizedBox(height: 20),
+                        _buildGenresSection(),
+                        const SizedBox(height: 20),
+                        _buildAgeCategories(),
+                        const SizedBox(height: 20),
+                        _buildRecentlyInteractedBooks(),
+                        const SizedBox(height: 20),
+                        _buildTopExploredBooks(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (index) {
@@ -103,12 +240,40 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Search books...',
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 12,
+                ),
+                isDense: true,
+                suffixIcon:
+                    _searchController.text.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(
+                            Icons.clear,
+                            color: Colors.grey,
+                            size: 20,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () {
+                            setState(() {
+                              _searchController.clear();
+                            });
+                          },
+                        )
+                        : null,
+                alignLabelWithHint: true,
               ),
+              textAlignVertical: TextAlignVertical.center,
               onSubmitted: _searchBooks,
+              onChanged: (value) {
+                // Trigger rebuild to show/hide clear button
+                setState(() {});
+              },
+              autofocus: false, // Prevent automatic focus
             ),
           ),
         ),
@@ -129,45 +294,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildGenresSection() {
-    // List of all available genres with their icons
-    final List<Map<String, dynamic>> allGenres = [
-      {'title': 'Biographies', 'icon': Icons.contact_page},
-      {'title': 'Literature', 'icon': Icons.feed},
-      {'title': 'Engineering', 'icon': Icons.engineering},
-      {'title': 'History', 'icon': Icons.history_edu},
-      {'title': 'Law', 'icon': Icons.gavel},
-      {'title': 'Fantasy', 'icon': Icons.auto_stories},
-      {'title': 'Science', 'icon': Icons.science},
-      {'title': 'Fiction', 'icon': Icons.menu_book},
-      {'title': 'Self-Help', 'icon': Icons.psychology},
-      {'title': 'Business', 'icon': Icons.business},
-      {'title': 'Technology', 'icon': Icons.computer},
-      {'title': 'Art', 'icon': Icons.palette},
-      {'title': 'Poetry', 'icon': Icons.format_quote},
-      {'title': 'Cooking', 'icon': Icons.restaurant},
-      {'title': 'Travel', 'icon': Icons.flight},
-      {'title': 'Sports', 'icon': Icons.sports_soccer},
-      {'title': 'Mystery', 'icon': Icons.search},
-      {'title': 'Romance', 'icon': Icons.favorite},
-      {'title': 'Thriller', 'icon': Icons.bolt},
-      {'title': 'Horror', 'icon': Icons.dark_mode},
-      {'title': 'Comics', 'icon': Icons.photo_album},
-      {'title': 'Religion', 'icon': Icons.church},
-      {'title': 'Philosophy', 'icon': Icons.psychology_alt},
-      {'title': 'Medicine', 'icon': Icons.medical_services},
-    ];
-
-    // Shuffle the genres list to display them randomly
-    final List<Map<String, dynamic>> shuffledGenres = List.from(allGenres)
-      ..shuffle();
-
     // Calculate how many genres can fit in one row
     // Assuming each genre item takes about 70-80 pixels width including spacing
     final int genresPerRow = (MediaQuery.of(context).size.width - 32) ~/ 60;
 
     // Take only the number of genres that can fit in one row
     final List<Map<String, dynamic>> displayedGenres =
-        shuffledGenres.take(genresPerRow).toList();
+        _shuffledGenres.take(genresPerRow).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,9 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             return SingleChildScrollView(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
+                                padding: const EdgeInsets.symmetric(),
                                 child: Wrap(
                                   spacing: 12,
                                   runSpacing: 12,
@@ -380,6 +511,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         // Navigate to genre-specific book list
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GenreBooksScreen(genre: title, icon: icon),
+          ),
+        );
         debugPrint('Selected genre: $title');
       },
       child: Column(
@@ -394,7 +531,16 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Icon(icon, color: Colors.orange, size: 30),
           ),
           const SizedBox(height: 4),
-          Text(title, style: const TextStyle(fontSize: 10)),
+          SizedBox(
+            width: 60, // Fixed width
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 10),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -405,7 +551,19 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              // Navigate to genre screen with "Kids" genre
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => GenreBooksScreen(
+                        genre: 'Kids',
+                        icon: Icons.child_care,
+                      ),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.purple[100],
               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -419,7 +577,17 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(width: 10),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              // Navigate to genre screen with "Teens" genre
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) =>
+                          GenreBooksScreen(genre: 'Teens', icon: Icons.school),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green[100],
               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -438,6 +606,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRecentlyInteractedBooks() {
+    // If there are no recent books, return an empty container (hidden section)
+    if (_recentBooks.isEmpty) {
+      return Container();
+    }
+    // Otherwise, show the section with books
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -464,73 +637,123 @@ class _HomeScreenState extends State<HomeScreen> {
         SizedBox(
           // For 1:1.5 aspect ratio, height = width * 1.5
           height: (MediaQuery.of(context).size.width - 32 - 20) / 3 * 1.5,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 6,
-            itemBuilder: (context, index) {
-              // Set the width to match the grid items (screen width / 3 - spacing)
-              final itemWidth =
-                  (MediaQuery.of(context).size.width - 32 - 20) / 3;
+          child:
+              _recentBooks.isEmpty
+                  ? const Center(child: Text('No recent books found'))
+                  : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _recentBooks.length,
+                    itemBuilder: (context, index) {
+                      final book = _recentBooks[index];
+                      // Set the width to match the grid items (screen width / 3 - spacing)
+                      final itemWidth =
+                          (MediaQuery.of(context).size.width - 32 - 20) / 3;
 
-              return Container(
-                width: itemWidth,
-                margin: const EdgeInsets.only(right: 10),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(10),
+                      return GestureDetector(
+                        onTap: () async {
+                          // Navigate to book details
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      BookDescriptionScreen(book: book),
+                            ),
+                          );
+
+                          // Refresh books after returning from book details
+                          _fetchBooks();
+
+                          debugPrint('Selected book: ${book.bookName}');
+                        },
+                        child: Container(
+                          width: itemWidth,
+                          margin: const EdgeInsets.only(right: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(10),
+                                  ),
+                                  child:
+                                      book.coverUrl != null
+                                          ? Image.network(
+                                            book.coverUrl!,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            fit: BoxFit.cover,
+                                            alignment: Alignment.topCenter,
+                                            errorBuilder: (
+                                              context,
+                                              error,
+                                              stackTrace,
+                                            ) {
+                                              debugPrint(
+                                                'Error loading image: $error',
+                                              );
+                                              return Container(
+                                                color: Colors.grey,
+                                                child: Center(
+                                                  child: Icon(
+                                                    Icons.broken_image,
+                                                    size: 30,
+                                                    color: Colors.grey[600],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          )
+                                          : Container(
+                                            color: Colors.grey[300],
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.book,
+                                                size: 30,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                          ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      book.bookName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      book.authorName,
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        color: Colors.grey[600],
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Center(
-                          child: Icon(
-                            Icons.book,
-                            size: 30,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Book ${index + 1}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Author ${index + 1}',
-                            style: TextStyle(
-                              fontSize: 8,
-                              color: Colors.grey[600],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+                      );
+                    },
+                  ),
         ),
       ],
     );
@@ -551,85 +774,132 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.orange,
               ),
             ),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                'View all',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
           ],
         ),
+        const SizedBox(height: 10),
         // Grid view for Top Explored Books with 3 columns
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            childAspectRatio:
-                1 / 1.5, // Set aspect ratio to 1:1.5 (width:height)
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemCount: 9, // Display 9 books (3 rows of 3)
-          itemBuilder: (context, index) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
+        _topBooks.isEmpty
+            ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text('No top books found'),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(10),
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.book,
-                          size: 30,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+            )
+            : GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio:
+                    1 / 1.5, // Set aspect ratio to 1:1.5 (width:height)
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: _topBooks.length,
+              itemBuilder: (context, index) {
+                final book = _topBooks[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context)
+                        .push(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => BookDescriptionScreen(book: book),
+                          ),
+                        )
+                        .then((_) {
+                          // This will run after returning from BookDescriptionScreen
+                          _fetchBooks();
+                        });
+
+                    debugPrint('Selected book: ${book.bookName}');
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(6.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Book ${index + 1}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(10),
+                            ),
+                            child:
+                                book.coverUrl != null
+                                    ? Image.network(
+                                      book.coverUrl!,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.topCenter,
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        debugPrint(
+                                          'Error loading image: $error',
+                                        );
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.broken_image,
+                                              size: 30,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                    : Container(
+                                      color: Colors.grey[300],
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.book,
+                                          size: 30,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Author ${index + 1}',
-                          style: TextStyle(
-                            fontSize: 8,
-                            color: Colors.grey[600],
+                        Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                book.bookName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                book.authorName,
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                );
+              },
+            ),
       ],
     );
   }

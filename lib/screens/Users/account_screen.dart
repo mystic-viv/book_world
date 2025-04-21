@@ -2,6 +2,7 @@ import 'package:book_world/routes/route_names.dart';
 import 'package:book_world/screens/Users/borrowed_books_screen.dart';
 import 'package:book_world/screens/Users/home_screen.dart';
 import 'package:book_world/services/storage_service.dart';
+import 'package:book_world/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -116,19 +117,7 @@ class AccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Account",
-          style: TextStyle(
-            color: Colors.orange,
-            fontFamily: 'Sanchez',
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        scrolledUnderElevation: 0,
-      ),
+      appBar: CustomAppBar(title: "Account"),
       body: SingleChildScrollView(
         child: Column(
           children: [

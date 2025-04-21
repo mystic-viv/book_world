@@ -1,5 +1,6 @@
 import 'package:book_world/routes/route_names.dart';
 import 'package:book_world/screens/Users/home_screen.dart';
+import 'package:book_world/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 
@@ -154,19 +155,7 @@ class BorrowedBooksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Borrowed Books",
-          style: TextStyle(
-            color: Colors.orange,
-            fontFamily: 'Sanchez',
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        scrolledUnderElevation: 0,
-      ),
+     appBar: CustomAppBar(title: "Borrowed Books"),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

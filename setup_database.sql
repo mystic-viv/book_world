@@ -51,3 +51,13 @@ CREATE TABLE books (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   is_ebook BOOLEAN DEFAULT TRUE,
 );
+
+-- Creating Saved Books Table
+CREATE TABLE saved_books (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id),
+  book_id UUID REFERENCES books(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, book_id)
+);
+
