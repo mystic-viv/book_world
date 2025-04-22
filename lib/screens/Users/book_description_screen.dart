@@ -1,6 +1,7 @@
 import 'package:book_world/models/book_model.dart';
 import 'package:flutter/material.dart';
 import 'package:book_world/services/book_service.dart';
+import 'package:get/route_manager.dart';
 
 class BookDescriptionScreen extends StatefulWidget {
   final BookModel book;
@@ -32,31 +33,47 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
 
   Future<void> _checkIfBookIsSaved() async {
     final isSaved = await _bookService.isBookSaved(widget.book.id);
-    setState(() {
-      _isSaved = isSaved;
-    });
+    if (mounted) {
+      // Add this check
+      setState(() {
+        _isSaved = isSaved;
+      });
+    }
   }
 
   Future<void> _toggleSave() async {
     if (_isLoading) return;
 
-    setState(() => _isLoading = true);
+   if (mounted) {
+      // Add this check
+      setState(() => _isLoading = true);
+    }
     try {
       if (_isSaved) {
         await _bookService.unsaveBook(widget.book.id);
       } else {
         await _bookService.saveBook(widget.book.id);
       }
-      setState(() => _isSaved = !_isSaved);
+       if (mounted) {
+        // Add this check
+        setState(() => _isSaved = !_isSaved);
+      }
+      ;
     } catch (e) {
       debugPrint('Error toggling save: $e');
     }
-    setState(() => _isLoading = false);
+    if (mounted) {
+      // Add this check
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _fetchSimilarBooks() async {
     if (widget.book.genres == null || widget.book.genres!.isEmpty) {
-      setState(() => _isLoading = false);
+       if (mounted) {
+        // Add this check
+        setState(() => _isLoading = false);
+      }
       return;
     }
 
@@ -67,13 +84,18 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
         limit: 10,
       );
 
+       if (mounted) {  // Add this check
       setState(() {
         _similarBooks = similarBooks;
         _isLoading = false;
       });
+    }
     } catch (e) {
       debugPrint('Error fetching similar books: $e');
-      setState(() => _isLoading = false);
+      if (mounted) {
+        // Add this check
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -85,7 +107,7 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
           padding: const EdgeInsets.only(left: 10.0),
           child: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.orange),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Get.back(),
           ),
         ),
         actions: [

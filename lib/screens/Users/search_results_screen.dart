@@ -1,16 +1,18 @@
+import 'package:book_world/routes/route_names.dart';
 import 'package:book_world/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:book_world/models/book_model.dart';
+import 'package:get/route_manager.dart';
 
 class SearchResultsScreen extends StatelessWidget {
   final String query;
   final List<BookModel> results;
 
   const SearchResultsScreen({
-    Key? key,
+    super.key,
     required this.query,
     required this.results,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +77,7 @@ class SearchResultsScreen extends StatelessWidget {
                         return GestureDetector(
                           onTap: () {
                             // Navigate to book details (to be implemented)
+                            Get.toNamed(RouteNames.bookDescription, arguments: book);
                             debugPrint('Selected book: ${book.bookName}');
                           },
                           child: Container(

@@ -1,13 +1,10 @@
 import 'package:book_world/routes/route_names.dart';
-import 'package:book_world/screens/Users/book_description_screen.dart';
-import 'package:book_world/screens/Users/genre_books_screen.dart';
-import 'package:book_world/screens/Users/search_results_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/route_manager.dart';
 import 'dart:math' show min, max;
 import 'package:book_world/models/book_model.dart';
 import 'package:book_world/services/book_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final BookService _bookService = BookService();
-  final SupabaseClient _supabase = Supabase.instance.client;
 
   List<BookModel> _recentBooks = [];
   List<BookModel> _topBooks = [];
@@ -33,10 +29,36 @@ class _HomeScreenState extends State<HomeScreen> {
     {'title': 'Engineering', 'icon': Icons.engineering},
     {'title': 'History', 'icon': Icons.history_edu},
     {'title': 'Law', 'icon': Icons.gavel},
-    {'title': 'Fantasy', 'icon': Icons.auto_stories},
-    {'title': 'Science', 'icon': Icons.science},
-    {'title': 'Fiction', 'icon': Icons.menu_book},
+    {'title': 'Fantasy', 'icon': Icons.castle},
+    {'title': 'Fiction', 'icon': FontAwesomeIcons.wandMagicSparkles},
+    {'title': 'Non-Fiction', 'icon': Icons.book},
+    {'title': 'Graphic Novels', 'icon': Icons.auto_stories},
+    {'title': 'Comics', 'icon': Icons.photo_album},
+    {'title': 'Mystery', 'icon': Icons.search},
+    {'title': 'Adventure', 'icon': Icons.explore},
+    {'title': 'Sci-Fi', 'icon': Icons.science},
+    {'title': 'Psychology', 'icon': Icons.psychology},
+    {'title': 'Sprituality', 'icon': FontAwesomeIcons.bookTanakh},
+    {'title': 'Self-Improvement', 'icon': Icons.self_improvement},
+    {'title': 'Parenting', 'icon': Icons.family_restroom},
+    {'title': 'Relationships', 'icon': Icons.people},
+    {'title': 'Personal Development', 'icon': Icons.developer_mode},
     {'title': 'Self-Help', 'icon': Icons.psychology},
+    {'title': 'Health', 'icon': Icons.health_and_safety},
+    {'title': 'Finance', 'icon': Icons.monetization_on},
+    {'title': 'Education', 'icon': Icons.school},
+    {'title': 'Politics', 'icon': Icons.public},
+    {'title': 'Environment', 'icon': Icons.eco},
+    {'title': 'Science', 'icon': Icons.science},
+    {'title': 'Music', 'icon': Icons.music_note},
+    {'title': 'Photography', 'icon': Icons.photo_camera},
+    {'title': 'Fashion', 'icon': Icons.checkroom},
+    {'title': 'Fitness', 'icon': Icons.fitness_center},
+    {'title': 'Gardening', 'icon': Icons.nature_people},
+    {'title': 'Architecture', 'icon': Icons.home_repair_service},
+    {'title': 'DIY', 'icon': Icons.build},
+   // {'title': 'Crafts', 'icon': Icons.crafts},
+    {'title': 'Animals', 'icon': Icons.pets},
     {'title': 'Business', 'icon': Icons.business},
     {'title': 'Technology', 'icon': Icons.computer},
     {'title': 'Art', 'icon': Icons.palette},
@@ -44,12 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
     {'title': 'Cooking', 'icon': Icons.restaurant},
     {'title': 'Travel', 'icon': Icons.flight},
     {'title': 'Sports', 'icon': Icons.sports_soccer},
-    {'title': 'Mystery', 'icon': Icons.search},
     {'title': 'Romance', 'icon': Icons.favorite},
     {'title': 'Thriller', 'icon': Icons.bolt},
     {'title': 'Horror', 'icon': Icons.dark_mode},
-    {'title': 'Comics', 'icon': Icons.photo_album},
-    {'title': 'Religion', 'icon': Icons.church},
+    {'title': 'Religion', 'icon': Icons.temple_hindu},
     {'title': 'Philosophy', 'icon': Icons.psychology_alt},
     {'title': 'Medicine', 'icon': Icons.medical_services},
   ];
@@ -73,12 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
       });
 
       // Get recently interacted books using BookService
-      final recentlyInteractedBooks = await _bookService
-          .getRecentlyInteractedBooks(limit: 10);
+      final recentlyInteractedBooks =
+          await _bookService.getRecentlyInteractedBooks();
 
       // Only set _recentBooks if there are actual interactions
       if (recentlyInteractedBooks.isNotEmpty) {
-        _recentBooks = recentlyInteractedBooks;
+        _recentBooks = recentlyInteractedBooks.take(10).toList();
       } else {
         // Leave _recentBooks as an empty list
         _recentBooks = [];
@@ -86,10 +106,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Get top explored books based on interaction counts
       final topExploredBooks = await _bookService.getTopExploredBooks();
-      final topBooks = topExploredBooks;
 
       setState(() {
-        _topBooks = topBooks.take(min(12, topBooks.length)).toList();
+        _topBooks =
+            topExploredBooks.take(min(12, topExploredBooks.length)).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -104,35 +124,50 @@ class _HomeScreenState extends State<HomeScreen> {
     if (query.trim().isEmpty) return;
 
     // Show loading indicator
-    showDialog(
+    if(mounted){
+       setState(() {
+        _isLoading = true;
+      });
+    }
+    /*showDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (context) => const Center(
-            child: CircularProgressIndicator(color: Colors.orange),
-          ),
-    );
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(color: Colors.orange),
+        );
+      },
+    );*/
 
     // Use BookService to search books
     _bookService
         .searchBooks(query)
         .then((searchResults) {
           // Close loading indicator
-          Navigator.pop(context);
+          if(mounted){
+            setState(() {
+              _isLoading = false;
+            });
+          }
+          /*Navigator.pop(context);*/
 
           // Navigate to search results screen
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (context) =>
-                      SearchResultsScreen(query: query, results: searchResults),
-            ),
-          );
+          Get.toNamed(RouteNames.searchResults, arguments: {
+            'query': query,
+            'results': searchResults,
+          })!.then((_) {
+            // This will run after returning from SearchResultsScreen
+            _fetchBooks(); // Refresh books after returning
+          });
         })
         .catchError((error) {
           // Close loading indicator
-          Navigator.pop(context);
+          if(mounted){
+            setState(() {
+              _isLoading = false;
+            });
+          }
+          /*Navigator.pop(context);*/
 
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
@@ -330,6 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children:
               displayedGenres
                   .map((genre) => _genreItem(genre['title'], genre['icon']))
@@ -454,22 +490,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                 allGenres.sublist(startIndex, endIndex);
 
                             return SingleChildScrollView(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(),
-                                child: Wrap(
-                                  spacing: 12,
-                                  runSpacing: 12,
-                                  alignment: WrapAlignment.center,
-                                  children:
-                                      pageGenres
-                                          .map(
-                                            (genre) => _genreItem(
-                                              genre['title'],
-                                              genre['icon'],
-                                            ),
-                                          )
-                                          .toList(),
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Wrap(
+                                    spacing: 12,
+                                    runSpacing: 12,
+                                    alignment: WrapAlignment.start,
+                                    children:
+                                        pageGenres
+                                            .map(
+                                              (genre) => _genreItem(
+                                                genre['title'],
+                                                genre['icon'],
+                                              ),
+                                            )
+                                            .toList(),
+                                  ),
+                                ],
                               ),
                             );
                           },
@@ -477,7 +516,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
 
                       // Page indicator
-                      const SizedBox(height: 16),
+                      //const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(totalPages, (index) {
@@ -511,11 +550,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         // Navigate to genre-specific book list
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GenreBooksScreen(genre: title, icon: icon),
-          ),
+        Get.toNamed(
+          RouteNames.genreBooks,
+          arguments: {'genre': title, 'icon': icon},
         );
         debugPrint('Selected genre: $title');
       },
@@ -532,12 +569,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 4),
           SizedBox(
-            width: 60, // Fixed width
+            width: 60,
+           // height: 25, // Fixed width
             child: Text(
               title,
               style: const TextStyle(fontSize: 10),
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -553,15 +591,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ElevatedButton(
             onPressed: () {
               // Navigate to genre screen with "Kids" genre
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (context) => GenreBooksScreen(
-                        genre: 'Kids',
-                        icon: Icons.child_care,
-                      ),
-                ),
+              Get.toNamed(
+                RouteNames.genreBooks,
+                arguments: {'genre': 'Kids', 'icon': Icons.child_care},
               );
             },
             style: ElevatedButton.styleFrom(
@@ -579,13 +611,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ElevatedButton(
             onPressed: () {
               // Navigate to genre screen with "Teens" genre
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (context) =>
-                          GenreBooksScreen(genre: 'Teens', icon: Icons.school),
-                ),
+              Get.toNamed(
+                RouteNames.genreBooks,
+                arguments: {'genre': 'Teens', 'icon': Icons.school},
               );
             },
             style: ElevatedButton.styleFrom(
@@ -652,17 +680,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       return GestureDetector(
                         onTap: () async {
                           // Navigate to book details
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      BookDescriptionScreen(book: book),
-                            ),
-                          );
-
-                          // Refresh books after returning from book details
-                          _fetchBooks();
+                          await Get.toNamed(
+                            RouteNames.bookDescription,
+                            arguments: book,
+                          )!.then((_) {
+                            // This will run after returning from BookDescriptionScreen
+                            _fetchBooks(); // Refresh books after returning
+                          });
 
                           debugPrint('Selected book: ${book.bookName}');
                         },
@@ -800,13 +824,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final book = _topBooks[index];
                 return GestureDetector(
                   onTap: () {
-                    Navigator.of(context)
-                        .push(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => BookDescriptionScreen(book: book),
-                          ),
-                        )
+                    Get.toNamed(RouteNames.bookDescription, arguments: book)!
                         .then((_) {
                           // This will run after returning from BookDescriptionScreen
                           _fetchBooks();

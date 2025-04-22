@@ -8,10 +8,15 @@ class RouteNames {
   static const String signup1 = '/signup1';
   static const String signup2 = '/signup2';
   static const String signup3 = '/signup3';
+
+  // User routes
   static const String home = '/home';
   static const String savedBooks = '/savedBooks';
   static const String borrowedBooks = '/borrowedBooks';
   static const String account = '/account';
+  static const String bookDescription = '/book-description';
+  static const String searchResults = '/search-results';
+  static const String genreBooks = '/genre-books';
 
   // Admin routes
   static const String adminDashboard = '/adminDashboard';

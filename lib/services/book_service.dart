@@ -341,7 +341,7 @@ class BookService {
   }
 
   // Get recently interacted books for the current user
-  Future<List<BookModel>> getRecentlyInteractedBooks({limit = 10}) async {
+  Future<List<BookModel>> getRecentlyInteractedBooks() async {
     try {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) return [];
@@ -378,8 +378,7 @@ class BookService {
       final booksResponse = await supabase
           .from('books')
           .select()
-          .inFilter('id', orderedUniqueBookIds)
-          .limit(limit);
+          .inFilter('id', orderedUniqueBookIds);
 
       debugPrint('Books response length: ${booksResponse.length}');
 
@@ -422,11 +421,33 @@ class BookService {
   // Get top explored books based on interaction count from all users
   Future<List<BookModel>> getTopExploredBooks() async {
     try {
-      // First, get all book interactions
+      // Get ALL books first
+      final allBooksResponse = await supabase
+          .from('books')
+          .select()
+          .order('created_at', ascending: false);
+    
+      final List<BookModel> allBooks = 
+          allBooksResponse.map<BookModel>((book) => BookModel.fromJson(book)).toList();
+    
+      if (allBooks.isEmpty) {
+        return [];
+      }
+    
+      // Then get all book interactions
       final interactionsResponse = await supabase
           .from('book_interactions')
           .select('book_id, interaction_type')
           .eq('interaction_type', 'view');
+    
+      // Debug print to see what's happening
+      debugPrint('All books count: ${allBooks.length}');
+      debugPrint('Interactions count: ${interactionsResponse.length}');
+    
+      // If no interactions, just return all books
+      if (interactionsResponse.isEmpty) {
+        return allBooks;
+      }
     
       // Count interactions for each book
       final Map<String, int> bookViewCounts = {};
@@ -435,55 +456,36 @@ class BookService {
         bookViewCounts[bookId] = (bookViewCounts[bookId] ?? 0) + 1;
       }
     
-      // Sort book IDs by view count
-      final List<String> orderedBookIds = bookViewCounts.keys.toList()
-        ..sort((a, b) => bookViewCounts[b]!.compareTo(bookViewCounts[a]!));
+      // Debug print the view counts
+      debugPrint('Book view counts: $bookViewCounts');
     
-      if (orderedBookIds.isEmpty) {
-        // If no interactions, return recently added books
-        return await getRecentlyAddedBooks();
-      }
+      // Create two lists: books with views and books without views
+      final List<BookModel> booksWithViews = [];
+      final List<BookModel> booksWithoutViews = [];
     
-      // Take only the top book IDs up to the limit
-      final topBookIds = orderedBookIds.toList();
-    
-      // Get books by these IDs
-      final booksResponse = await supabase
-          .from('books')
-          .select()
-          .inFilter('id', topBookIds);
-    
-      final Map<String, BookModel> booksMap = {
-        for (var book in booksResponse) 
-          book['id']: BookModel.fromJson(book)
-      };
-    
-      // Arrange books in the same order as topBookIds
-      final List<BookModel> orderedBooks = [];
-      for (final bookId in topBookIds) {
-        if (booksMap.containsKey(bookId)) {
-          orderedBooks.add(booksMap[bookId]!);
+      for (final book in allBooks) {
+        if (bookViewCounts.containsKey(book.id)) {
+          booksWithViews.add(book);
+        } else {
+          booksWithoutViews.add(book);
         }
       }
     
-      // If we need more books to reach the limit, get recently added books
-        final remainingCount = orderedBooks.length;
-        final existingIds = orderedBooks.map((book) => book.id).toSet();
-      
-        final recentBooks = await getRecentlyAddedBooks();
-        final additionalBooks = recentBooks
-            .where((book) => !existingIds.contains(book.id))
-            .take(remainingCount)
-            .toList();
-      
-        orderedBooks.addAll(additionalBooks);
-      
+      // Sort books with views by view count
+      booksWithViews.sort((a, b) {
+        final viewsA = bookViewCounts[a.id] ?? 0;
+        final viewsB = bookViewCounts[b.id] ?? 0;
+        return viewsB.compareTo(viewsA);
+      });
     
-      return orderedBooks;
+      // Combine the lists: first books with views, then books without views
+      final List<BookModel> result = [...booksWithViews, ...booksWithoutViews];
+    
+      debugPrint('Final result count: ${result.length}');
+      return result;
     } catch (e) {
       debugPrint('Error fetching top explored books: $e');
-      // Fallback to recently added books
-      return await getRecentlyAddedBooks();
+      return [];
     }
   }
 

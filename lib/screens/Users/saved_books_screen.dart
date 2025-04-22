@@ -83,49 +83,65 @@ class _SavedBooksScreenState extends State<SavedBooksScreen> {
                       ),
                       child: Row(
                         children: [
-                          Container(
-                            width: 90,
-                            height: 145,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: book.coverUrl != null
-                                  ? Image.network(
-                                      book.coverUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: Colors.grey[300],
-                                          child: const Icon(Icons.book, size: 30),
-                                        );
-                                      },
-                                    )
-                                  : Container(
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.book, size: 30),
-                                    ),
+                          
+                          GestureDetector(
+                            onTap: () {
+                              Get.toNamed(RouteNames.bookDescription, arguments: book);
+                            },
+                            child: Container(
+                              width: 90,
+                              height: 145,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: book.coverUrl != null
+                                    ? Image.network(
+                                        book.coverUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: Colors.grey[300],
+                                            child: const Icon(Icons.book, size: 30),
+                                          );
+                                        },
+                                      )
+                                    : Container(
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.book, size: 30),
+                                      ),
+                              ),
                             ),
                           ),                          const SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  book.bookName,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.toNamed(RouteNames.bookDescription, arguments: book);
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                  Text(
+                                    book.bookName,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'By ${book.authorName}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'By ${book.authorName}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
                                   ),
+                                    ]
+                                                              ),
                                 ),
                                 const SizedBox(height: 12),
                                 Row(
