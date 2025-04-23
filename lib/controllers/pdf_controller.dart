@@ -38,10 +38,10 @@ class PDFController extends GetxController {
   }
   
   Future<void> loadPdf() async {
+    isLoading.value = true;
+    isError.value = false;
+    
     try {
-      isLoading.value = true;
-      isError.value = false;
-      
       // Get PDF URL if not provided
       final String? finalPdfUrl = await _pdfService.getPdfUrl(bookId, pdfUrl);
       if (finalPdfUrl == null) {
@@ -61,6 +61,11 @@ class PDFController extends GetxController {
       
       // Load reading progress from database
       await loadReadingProgress();
+      
+      // After successful loading, initialize the page count
+      if (pdfViewerController.pageCount > 0) {
+        totalPages.value = pdfViewerController.pageCount;
+      }
       
       isLoading.value = false;
     } catch (e) {

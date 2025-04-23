@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     {'title': 'Self-Improvement', 'icon': Icons.self_improvement},
     {'title': 'Parenting', 'icon': Icons.family_restroom},
     {'title': 'Relationships', 'icon': Icons.people},
-   // {'title': 'Personal Development', 'icon': Icons.developer_mode},
+    // {'title': 'Personal Development', 'icon': Icons.developer_mode},
     {'title': 'Health', 'icon': Icons.health_and_safety},
     {'title': 'Finance', 'icon': Icons.monetization_on},
     {'title': 'Educational', 'icon': Icons.school},
@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
     {'title': 'Gardening', 'icon': Icons.nature_people},
     {'title': 'Architecture', 'icon': Icons.architecture},
     {'title': 'DIY', 'icon': FontAwesomeIcons.screwdriverWrench},
-   // {'title': 'Crafts', 'icon': Icons.crafts},
+    // {'title': 'Crafts', 'icon': Icons.crafts},
     {'title': 'Animals', 'icon': Icons.pets},
     {'title': 'Business', 'icon': Icons.business},
     {'title': 'Technology', 'icon': Icons.computer},
@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
     {'title': 'Romance', 'icon': Icons.favorite},
     {'title': 'Thriller', 'icon': Icons.bolt},
     {'title': 'Horror', 'icon': FontAwesomeIcons.ghost},
-    {'title': 'Religion', 'icon': Icons.temple_hindu},
+    {'title': 'Religion', 'icon': FontAwesomeIcons.handsPraying},
     {'title': 'Philosophy', 'icon': Icons.psychology_alt},
     {'title': 'Medicine', 'icon': Icons.medical_services},
   ];
@@ -123,8 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (query.trim().isEmpty) return;
 
     // Show loading indicator
-    if(mounted){
-       setState(() {
+    if (mounted) {
+      setState(() {
         _isLoading = true;
       });
     }
@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .searchBooks(query)
         .then((searchResults) {
           // Close loading indicator
-          if(mounted){
+          if (mounted) {
             setState(() {
               _isLoading = false;
             });
@@ -151,17 +151,17 @@ class _HomeScreenState extends State<HomeScreen> {
           /*Navigator.pop(context);*/
 
           // Navigate to search results screen
-          Get.toNamed(RouteNames.searchResults, arguments: {
-            'query': query,
-            'results': searchResults,
-          })!.then((_) {
+          Get.toNamed(
+            RouteNames.searchResults,
+            arguments: {'query': query, 'results': searchResults},
+          )!.then((_) {
             // This will run after returning from SearchResultsScreen
             _fetchBooks(); // Refresh books after returning
           });
         })
         .catchError((error) {
           // Close loading indicator
-          if(mounted){
+          if (mounted) {
             setState(() {
               _isLoading = false;
             });
@@ -569,7 +569,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 4),
           SizedBox(
             width: 60,
-           // height: 25, // Fixed width
+            // height: 25, // Fixed width
             child: Text(
               title,
               style: const TextStyle(fontSize: 10),
@@ -582,6 +582,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   Widget _buildAgeCategories() {
     return Row(
       children: [
@@ -822,11 +823,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 final book = _topBooks[index];
                 return GestureDetector(
                   onTap: () {
-                    Get.toNamed(RouteNames.bookDescription, arguments: book)!
-                        .then((_) {
-                          // This will run after returning from BookDescriptionScreen
-                          _fetchBooks();
-                        });
+                    Get.toNamed(
+                      RouteNames.bookDescription,
+                      arguments: book,
+                    )!.then((_) {
+                      // This will run after returning from BookDescriptionScreen
+                      _fetchBooks();
+                    });
 
                     debugPrint('Selected book: ${book.bookName}');
                   },
