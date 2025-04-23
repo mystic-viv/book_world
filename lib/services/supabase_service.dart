@@ -23,6 +23,16 @@ class SupabaseService extends GetxService {
     _cachedClient = null;
   }
 
+  // Check if the client is available and user is authenticated
+  static bool get isAuthenticated {
+    return client?.auth.currentUser != null;
+  }
+
+  // Get current user ID safely
+  static String? get currentUserId {
+    return client?.auth.currentUser?.id;
+  }
+
   @override
   void onInit() {
     super.onInit();

@@ -1,3 +1,4 @@
+import 'package:book_world/controllers/pdf_controller.dart';
 import 'package:book_world/middleware/auth_middleware.dart';
 import 'package:book_world/middleware/role_middleware.dart';
 import 'package:book_world/models/book_model.dart';
@@ -5,10 +6,11 @@ import 'package:book_world/routes/route_names.dart';
 import 'package:book_world/screens/Users/account_screen.dart';
 import 'package:book_world/screens/Users/book_description_screen.dart';
 import 'package:book_world/screens/Users/borrowed_books_screen.dart';
-import 'package:book_world/screens/Users/genre_books_screen.dart';
-import 'package:book_world/screens/Users/home_screen.dart';
+import 'package:book_world/screens/Users/Home/genre_books_screen.dart';
+import 'package:book_world/screens/Users/Home/home_screen.dart';
+import 'package:book_world/screens/Users/pdf_viewer_screen.dart';
 import 'package:book_world/screens/Users/saved_books_screen.dart';
-import 'package:book_world/screens/Users/search_results_screen.dart';
+import 'package:book_world/screens/Users/Home/search_results_screen.dart';
 import 'package:book_world/screens/auth/forgot_password.dart';
 import 'package:book_world/screens/auth/librarian_email_verification.dart';
 import 'package:book_world/screens/auth/librarian_password_setup.dart';
@@ -24,6 +26,7 @@ import 'package:book_world/screens/librarians/librarian_home_screen.dart';
 import 'package:book_world/screens/splash_screen.dart';
 import 'package:book_world/screens/auth/login.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 
 class Routes {
@@ -145,7 +148,36 @@ class Routes {
       },
       middlewares: [AuthMiddleware()],
     ),
+
+    GetPage(
+      name: RouteNames.pdfViewer,
+      page: () {
+        final Map<String, dynamic> args = Get.arguments;
+        final String bookId = args['bookId'];
+        final String bookTitle = args['bookTitle'];
+        final String? pdfUrl = args['pdfUrl'];
+
+        // Register the controller
+        Get.put(PDFController(bookId: bookId, pdfUrl: pdfUrl));
+
+        return PDFViewerScreen(bookTitle: bookTitle);
+      },
+      middlewares: [AuthMiddleware()],
+    ),
   ];
+
+   // Helper method for PDF viewer navigation
+  static void toPdfViewer({
+    required String bookId,
+    required String bookTitle,
+    String? pdfUrl,
+  }) {
+    Get.toNamed(
+      RouteNames.pdfViewer,
+      arguments: {'bookId': bookId, 'bookTitle': bookTitle, 'pdfUrl': pdfUrl},
+    );
+  }
+
   // Helper method for navigation with arguments
   static void toBookDescription(BookModel book) {
     Get.toNamed(RouteNames.bookDescription, arguments: book);

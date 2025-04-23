@@ -49,7 +49,7 @@ CREATE TABLE books (
   added_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  is_ebook BOOLEAN DEFAULT TRUE,
+  is_ebook BOOLEAN DEFAULT TRUE
 );
 
 -- Creating Saved Books Table
@@ -61,3 +61,48 @@ CREATE TABLE saved_books (
   UNIQUE(user_id, book_id)
 );
 
+-- Creating Reading Progress Table
+CREATE TABLE reading_progress (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  book_id UUID REFERENCES books(id) NOT NULL,
+  last_read_page INTEGER NOT NULL DEFAULT 0,
+  last_read_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, book_id)
+);
+
+-- Creating Bookmarks Table
+CREATE TABLE bookmarks (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  book_id UUID REFERENCES books(id) NOT NULL,
+  page_number INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Index for faster bookmark lookups
+CREATE INDEX idx_bookmarks_user_book ON bookmarks(user_id, book_id);
+
+-- Creating PDF Metadata Table
+CREATE TABLE pdf_metadata (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  book_id UUID REFERENCES books(id) UNIQUE NOT NULL,
+  total_pages INTEGER,
+  file_size_bytes BIGINT,
+  last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  is_searchable BOOLEAN DEFAULT FALSE,
+  has_toc BOOLEAN DEFAULT FALSE
+);
+
+-- Creating PDF Downloads Table
+CREATE TABLE pdf_downloads (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  book_id UUID REFERENCES books(id) NOT NULL,
+  downloaded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  device_info TEXT
+);

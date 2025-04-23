@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:book_world/models/book_model.dart';
-import 'package:book_world/services/auth_service.dart';
+import 'package:book_world/services/supabase_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:path/path.dart' as path;
@@ -9,23 +9,6 @@ import 'package:uuid/uuid.dart';
 class BookService {
   static final supabase = Supabase.instance.client;
   static final uuid = Uuid();
-
-  // Get book details by ID
-  static Future<Map<String, dynamic>?> getBookById(String bookId) async {
-    try {
-      final response =
-          await supabase
-              .from('books')
-              .select('*')
-              .eq('custom_id', bookId) // Use custom_id instead of id
-              .single();
-
-      return response;
-    } catch (e) {
-      print('Error fetching book details: $e');
-      return null;
-    }
-  }
 
   // Upload a new book (for librarians)
   static Future<Map<String, dynamic>> uploadBook({
@@ -426,43 +409,45 @@ class BookService {
           .from('books')
           .select()
           .order('created_at', ascending: false);
-    
-      final List<BookModel> allBooks = 
-          allBooksResponse.map<BookModel>((book) => BookModel.fromJson(book)).toList();
-    
+
+      final List<BookModel> allBooks =
+          allBooksResponse
+              .map<BookModel>((book) => BookModel.fromJson(book))
+              .toList();
+
       if (allBooks.isEmpty) {
         return [];
       }
-    
+
       // Then get all book interactions
       final interactionsResponse = await supabase
           .from('book_interactions')
           .select('book_id, interaction_type')
           .eq('interaction_type', 'view');
-    
+
       // Debug print to see what's happening
       debugPrint('All books count: ${allBooks.length}');
       debugPrint('Interactions count: ${interactionsResponse.length}');
-    
+
       // If no interactions, just return all books
       if (interactionsResponse.isEmpty) {
         return allBooks;
       }
-    
+
       // Count interactions for each book
       final Map<String, int> bookViewCounts = {};
       for (final interaction in interactionsResponse) {
         final bookId = interaction['book_id'];
         bookViewCounts[bookId] = (bookViewCounts[bookId] ?? 0) + 1;
       }
-    
+
       // Debug print the view counts
       debugPrint('Book view counts: $bookViewCounts');
-    
+
       // Create two lists: books with views and books without views
       final List<BookModel> booksWithViews = [];
       final List<BookModel> booksWithoutViews = [];
-    
+
       for (final book in allBooks) {
         if (bookViewCounts.containsKey(book.id)) {
           booksWithViews.add(book);
@@ -470,17 +455,17 @@ class BookService {
           booksWithoutViews.add(book);
         }
       }
-    
+
       // Sort books with views by view count
       booksWithViews.sort((a, b) {
         final viewsA = bookViewCounts[a.id] ?? 0;
         final viewsB = bookViewCounts[b.id] ?? 0;
         return viewsB.compareTo(viewsA);
       });
-    
+
       // Combine the lists: first books with views, then books without views
       final List<BookModel> result = [...booksWithViews, ...booksWithoutViews];
-    
+
       debugPrint('Final result count: ${result.length}');
       return result;
     } catch (e) {
@@ -570,6 +555,46 @@ class BookService {
     } catch (e) {
       debugPrint('Error fetching similar books: $e');
       return [];
+    }
+  }
+
+  Future<BookModel> getBookById(String bookId) async {
+    try {
+      final response = await SupabaseService.client
+          ?.from('books')
+          .select()
+          .eq('id', bookId)
+          .single();
+
+      if (response == null) {
+        throw Exception('Book not found');
+      }
+
+      return BookModel.fromJson(response);
+    } catch (e) {
+      throw Exception('Failed to fetch book: $e');
+    }
+  }
+
+  // Update book model to include PDF URL
+  Future<List<BookModel>> getBooksWithPdf() async {
+    try {
+      final response = await supabase
+          .from('books')
+          .select()
+          .not('book_pdf_url', 'is', null);
+
+      // Handle the response based on the current Supabase client version
+      if (response == null) {
+        return [];
+      }
+
+      return (response as List)
+          .map((json) => BookModel.fromJson(json))
+          .toList();
+    } catch (e) {
+      debugPrint('Error fetching books with PDF: $e');
+      throw Exception('Failed to fetch books with PDF: $e');
     }
   }
 }

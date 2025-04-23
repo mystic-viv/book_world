@@ -1,4 +1,5 @@
 import 'package:book_world/models/book_model.dart';
+import 'package:book_world/routes/route.dart';
 import 'package:flutter/material.dart';
 import 'package:book_world/services/book_service.dart';
 import 'package:get/route_manager.dart';
@@ -356,7 +357,18 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              // Implement read functionality
+                              // Implemented read functionality
+                               Routes.toPdfViewer(
+                                bookId: widget.book.id,
+                                bookTitle: widget.book.bookName,
+                                pdfUrl: widget.book.pdfUrl,
+                              );
+
+                              // Record book interaction
+                              _bookService.recordBookInteraction(
+                                widget.book.id,
+                                'read',
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,

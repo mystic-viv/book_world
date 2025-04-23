@@ -5,7 +5,7 @@ class BookModel {
   final String authorName; // Direct author name instead of separate model
   final String description;
   final String? coverUrl;
-  final String? ebookUrl;
+  final String? pdfUrl;
   final List<String>? genres;
   final int totalCopies;
   final int availableCopies;
@@ -22,7 +22,7 @@ class BookModel {
     required this.authorName,
     required this.description,
     this.coverUrl,
-    this.ebookUrl,
+    this.pdfUrl,
     required this.totalCopies,
     required this.availableCopies,
     this.genres,
@@ -30,7 +30,7 @@ class BookModel {
     this.addedBy,
     required this.createdAt,
     required this.updatedAt,
-     this.isEbook = false,
+    this.isEbook = false,
   });
 
   // Create from JSON (from Supabase)
@@ -39,10 +39,10 @@ class BookModel {
       id: json['id'],
       customId: json['custom_id'],
       bookName: json['book_name'],
-      authorName:json['author_name'],
+      authorName: json['author_name'],
       description: json['description'] ?? '',
       coverUrl: json['book_cover_url'],
-      ebookUrl: json['book_pdf_url'],
+      pdfUrl: json['book_pdf_url'],
       totalCopies: json['total_copies'] ?? 0,
       availableCopies: json['available_copies'] ?? 0,
       genres: json['genres'] != null ? List<String>.from(json['genres']) : null,
@@ -66,10 +66,10 @@ class BookModel {
       'id': id,
       'custom_id': customId,
       'book_name': bookName,
-      'author_name':authorName,
+      'author_name': authorName,
       'description': description,
       'book_cover_url': coverUrl,
-      'book_pdf_url': ebookUrl,
+      'book_pdf_url': pdfUrl,
       'total_copies': totalCopies,
       'available_copies': availableCopies,
       'genres': genres,
@@ -107,7 +107,7 @@ class BookModel {
       authorName: authorName ?? this.authorName,
       description: description ?? this.description,
       coverUrl: coverUrl ?? this.coverUrl,
-      ebookUrl: ebookUrl ?? this.ebookUrl,
+      pdfUrl: ebookUrl ?? this.pdfUrl,
       totalCopies: totalCopies ?? this.totalCopies,
       availableCopies: availableCopies ?? this.availableCopies,
       genres: genres ?? this.genres,
