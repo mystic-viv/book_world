@@ -2,6 +2,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:book_world/models/pdf_bookmark_model.dart';
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class StorageServices {
   static final session = GetStorage();
   
@@ -208,6 +210,27 @@ class StorageServices {
       
       // Save to storage
       await session.write(key, localPath);
+    }
+  }
+  
+  // Add this static method to your StorageServices class
+  static Future<void> updateBookmark(PDFBookmark bookmark) async {
+    try {
+      // Get existing bookmarks
+      final bookmarks = getBookmarks(bookmark.bookId);
+      
+      // Find and update the bookmark
+      final index = bookmarks.indexWhere((b) => b.id == bookmark.id);
+      if (index >= 0) {
+        bookmarks[index] = bookmark;
+        
+        // Save updated list
+        final prefs = await SharedPreferences.getInstance();
+        final bookmarksJson = bookmarks.map((b) => b.toJson()).toList();
+        await prefs.setString('bookmarks_${bookmark.bookId}', jsonEncode(bookmarksJson));
+      }
+    } catch (e) {
+      print('Error updating bookmark in local storage: $e');
     }
   }
 }

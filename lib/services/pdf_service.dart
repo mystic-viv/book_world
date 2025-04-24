@@ -7,6 +7,7 @@ import 'package:book_world/services/book_service.dart';
 import 'package:book_world/services/supabase_service.dart';
 import 'package:book_world/models/pdf_bookmark_model.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter/material.dart';
 
 class PDFService {
   final StorageServices _storageService = StorageServices();
@@ -18,12 +19,26 @@ class PDFService {
   // Fetch PDF URL from Supabase if not provided
   Future<String?> getPdfUrl(String bookId, [String? providedUrl]) async {
     if (providedUrl != null && providedUrl.isNotEmpty) {
+      print('Using provided PDF URL: $providedUrl');
       return providedUrl;
     }
 
     try {
+      print('Fetching PDF URL for book ID: $bookId');
       // Fetch book details from Supabase to get PDF URL
       final book = await _bookService.getBookById(bookId);
+      
+      if (book == null) {
+        print('Book not found with ID: $bookId');
+        return null;
+      }
+      
+      if (book.pdfUrl == null || book.pdfUrl!.isEmpty) {
+        print('Book found but PDF URL is empty for book ID: $bookId');
+        return null;
+      }
+      
+      print('Retrieved PDF URL: ${book.pdfUrl}');
       return book.pdfUrl;
     } catch (e) {
       print('Error fetching PDF URL: $e');
@@ -128,16 +143,23 @@ class PDFService {
   // Save reading progress to database
   Future<void> saveReadingProgress(PDFReadingProgress progress) async {
     try {
-      if (_supabase == null) return;
+      if (_supabase == null) {
+        // If Supabase is not available, save to local storage
+        await StorageServices.saveReadingProgress(progress);
+        return;
+      }
       
-      // Try to update first
-      await _supabase.from('reading_progress').upsert({
-        'user_id': _supabase.auth.currentUser!.id,
-        'book_id': progress.bookId,
-        'last_read_page': progress.lastReadPage,
-        'last_read_time': progress.lastReadTime.toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
+      // Use upsert instead of insert to handle the unique constraint
+      await _supabase.from('reading_progress').upsert(
+        {
+          'user_id': _supabase.auth.currentUser!.id,
+          'book_id': progress.bookId,
+          'last_read_page': progress.lastReadPage,
+          'last_read_time': progress.lastReadTime.toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        },
+        onConflict: 'user_id,book_id'  // Specify the conflict columns
+      );
 
       // Also save to local storage as backup
       await StorageServices.saveReadingProgress(progress);
@@ -239,6 +261,30 @@ class PDFService {
       print('Error deleting bookmark from database: $e');
       // Fall back to local storage if database fails
       await StorageServices.deleteBookmark(bookmarkId);
+    }
+  }
+
+  // Add this method to your PDFService class
+  Future<void> updateBookmark(PDFBookmark bookmark) async {
+    try {
+      if (_supabase == null) {
+        // If Supabase is not available, update in local storage
+        await StorageServices.updateBookmark(bookmark);
+        return;
+      }
+      
+      // Update in Supabase
+      await _supabase.from('bookmarks').update({
+        'title': bookmark.title,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', bookmark.id).eq('user_id', _supabase.auth.currentUser!.id);
+      
+      // Also update in local storage as backup
+      await StorageServices.updateBookmark(bookmark);
+    } catch (e) {
+      print('Error updating bookmark in database: $e');
+      // Fall back to local storage if database fails
+      await StorageServices.updateBookmark(bookmark);
     }
   }
 }

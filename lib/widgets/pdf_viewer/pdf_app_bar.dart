@@ -33,6 +33,9 @@ class PDFAppBar extends StatelessWidget implements PreferredSizeWidget {
             fontFamily: 'Sanchez',
             fontWeight: FontWeight.bold,
           ),
+          // Add overflow handling for long titles
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -41,6 +44,18 @@ class PDFAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () => Get.back(),
         ),
         actions: [
+          // Text selection toggle button
+          Obx(() => IconButton(
+            icon: Icon(
+              controller.enableTextSelection.value
+                  ? Icons.text_fields
+                  : Icons.text_fields_outlined,
+              color: Colors.orange,
+            ),
+            onPressed: controller.toggleTextSelection,
+            tooltip: 'Toggle text selection',
+          )),
+          
           // Bookmark button
           Obx(() => IconButton(
             icon: Icon(
@@ -68,8 +83,7 @@ class PDFAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       );
     });
-  }
-  
+  }  
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

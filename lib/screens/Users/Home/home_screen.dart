@@ -24,53 +24,53 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // List of all available genres with their icons
   final List<Map<String, dynamic>> allGenres = [
-    {'title': 'Biographies', 'icon': Icons.contact_page},
-    {'title': 'Literature', 'icon': Icons.feed},
-    {'title': 'Engineering', 'icon': Icons.engineering},
-    {'title': 'History', 'icon': Icons.history_edu},
-    {'title': 'Law', 'icon': Icons.gavel},
-    {'title': 'Fantasy', 'icon': FontAwesomeIcons.dAndD},
-    {'title': 'Fiction', 'icon': Icons.auto_awesome},
-    {'title': 'Non-Fiction', 'icon': Icons.auto_stories},
-    {'title': 'Graphic Novels', 'icon': Icons.photo_album},
-    {'title': 'Comics', 'icon': FontAwesomeIcons.mask},
-    {'title': 'Mystery', 'icon': Icons.search},
-    {'title': 'Adventure', 'icon': Icons.explore},
-    {'title': 'Sci-Fi', 'icon': Icons.science},
-    {'title': 'Psychology', 'icon': Icons.psychology},
-    {'title': 'Sprituality', 'icon': FontAwesomeIcons.bookTanakh},
-    {'title': 'Self-Improvement', 'icon': Icons.self_improvement},
-    {'title': 'Parenting', 'icon': Icons.family_restroom},
-    {'title': 'Relationships', 'icon': Icons.people},
+    {'title': 'Biographies', 'icon': Icons.contact_page, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Literature', 'icon': Icons.feed, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Engineering', 'icon': Icons.engineering, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'History', 'icon': Icons.history_edu, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Law', 'icon': Icons.gavel, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Fantasy', 'icon': FontAwesomeIcons.dAndD, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Fiction', 'icon': Icons.auto_awesome, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Non-Fiction', 'icon': Icons.auto_stories, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Graphic Novels', 'icon': Icons.photo_album, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Comics', 'icon': FontAwesomeIcons.mask, 'padding': const EdgeInsets.only(top: 12.0, right: 14.5, bottom: 12.0, left: 9.5)},
+    {'title': 'Mystery', 'icon': Icons.search, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Adventure', 'icon': Icons.explore, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Sci-Fi', 'icon': Icons.science, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Psychology', 'icon': Icons.psychology, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Sprituality', 'icon': FontAwesomeIcons.bookTanakh, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Self-Improvement', 'icon': Icons.self_improvement, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Parenting', 'icon': Icons.family_restroom, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Relationships', 'icon': Icons.people, 'padding': const EdgeInsets.all(12.0)},
     // {'title': 'Personal Development', 'icon': Icons.developer_mode},
-    {'title': 'Health', 'icon': Icons.health_and_safety},
-    {'title': 'Finance', 'icon': Icons.monetization_on},
-    {'title': 'Educational', 'icon': Icons.school},
-    {'title': 'Politics', 'icon': Icons.public},
-    {'title': 'Environment', 'icon': Icons.eco},
-    {'title': 'Science', 'icon': Icons.science},
-    {'title': 'Music', 'icon': Icons.music_note},
-    {'title': 'Photography', 'icon': Icons.photo_camera},
-    {'title': 'Fashion', 'icon': Icons.checkroom},
-    {'title': 'Fitness', 'icon': Icons.fitness_center},
-    {'title': 'Gardening', 'icon': Icons.nature_people},
-    {'title': 'Architecture', 'icon': Icons.architecture},
-    {'title': 'DIY', 'icon': FontAwesomeIcons.screwdriverWrench},
+    {'title': 'Health', 'icon': Icons.health_and_safety, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Finance', 'icon': Icons.monetization_on, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Educational', 'icon': Icons.school, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Politics', 'icon': Icons.public, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Environment', 'icon': Icons.eco, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Science', 'icon': Icons.science, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Music', 'icon': Icons.music_note, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Photography', 'icon': Icons.photo_camera, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Fashion', 'icon': Icons.checkroom, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Fitness', 'icon': Icons.fitness_center,'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Gardening', 'icon': Icons.nature_people, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Architecture', 'icon': Icons.architecture, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'DIY', 'icon': FontAwesomeIcons.screwdriverWrench, 'padding': const EdgeInsets.all(12.0)},
     // {'title': 'Crafts', 'icon': Icons.crafts},
-    {'title': 'Animals', 'icon': Icons.pets},
-    {'title': 'Business', 'icon': Icons.business},
-    {'title': 'Technology', 'icon': Icons.computer},
-    {'title': 'Art', 'icon': Icons.palette},
-    {'title': 'Poetry', 'icon': Icons.format_quote},
-    {'title': 'Cooking', 'icon': Icons.restaurant},
-    {'title': 'Travel', 'icon': FontAwesomeIcons.car},
-    {'title': 'Sports', 'icon': Icons.sports_soccer},
-    {'title': 'Romance', 'icon': Icons.favorite},
-    {'title': 'Thriller', 'icon': Icons.bolt},
-    {'title': 'Horror', 'icon': FontAwesomeIcons.ghost},
-    {'title': 'Religion', 'icon': FontAwesomeIcons.handsPraying},
-    {'title': 'Philosophy', 'icon': Icons.psychology_alt},
-    {'title': 'Medicine', 'icon': Icons.medical_services},
+    {'title': 'Animals', 'icon': Icons.pets, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Business', 'icon': Icons.business, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Technology', 'icon': Icons.computer, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Art', 'icon': Icons.palette, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Poetry', 'icon': Icons.format_quote, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Cooking', 'icon': Icons.restaurant, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Travel', 'icon': FontAwesomeIcons.car, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Sports', 'icon': Icons.sports_soccer, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Romance', 'icon': Icons.favorite, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Thriller', 'icon': Icons.bolt, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Horror', 'icon': FontAwesomeIcons.ghost, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Religion', 'icon': FontAwesomeIcons.handsPraying, 'padding': const EdgeInsets.only(top: 12.0, right: 16.0, bottom: 12.0, left: 8.0)},
+    {'title': 'Philosophy', 'icon': Icons.psychology_alt, 'padding': const EdgeInsets.all(12.0)},
+    {'title': 'Medicine', 'icon': Icons.medical_services, 'padding': const EdgeInsets.all(12.0)},
   ];
 
   @override
@@ -367,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children:
               displayedGenres
-                  .map((genre) => _genreItem(genre['title'], genre['icon']))
+                  .map((genre) => _genreItem(genre['title'], genre['icon'], genre['padding']))
                   .toList(),
         ),
       ],
@@ -503,6 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               (genre) => _genreItem(
                                                 genre['title'],
                                                 genre['icon'],
+                                                genre['padding']
                                               ),
                                             )
                                             .toList(),
@@ -545,7 +546,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _genreItem(String title, IconData icon) {
+  Widget _genreItem(String title, IconData icon, EdgeInsets padding) {
     return GestureDetector(
       onTap: () {
         // Navigate to genre-specific book list
@@ -558,7 +559,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: padding,
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: Colors.orange),
