@@ -1,7 +1,7 @@
 import 'package:book_world/controllers/auth_controller.dart';
 import 'package:book_world/routes/route.dart';
 import 'package:book_world/routes/route_names.dart';
-import 'package:book_world/screens/Users/account_screen.dart';
+import 'package:book_world/screens/Users/Account/account_screen.dart';
 import 'package:book_world/screens/Users/borrowed_books_screen.dart';
 import 'package:book_world/screens/Users/Home/home_screen.dart';
 import 'package:book_world/screens/Users/saved_books_screen.dart';

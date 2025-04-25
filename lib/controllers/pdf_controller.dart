@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:book_world/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -496,12 +497,8 @@ class PDFController extends GetxController {
   void copySelectedText() {
     if (selectedText.value.isNotEmpty) {
       Clipboard.setData(ClipboardData(text: selectedText.value));
-      Get.snackbar(
-        'Copied',
-        'Text copied to clipboard',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
-      );
+      showSnackBar('Copied',
+        'Text copied to clipboard',);
       // Clear selection after copying
       pdfViewerController.clearSelection();
       selectedText.value = '';

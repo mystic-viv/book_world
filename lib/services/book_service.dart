@@ -533,25 +533,52 @@ class BookService {
     int limit = 10,
   }) async {
     try {
+      // Create a filtered genres list that excludes 'Non-Fiction'
+      List<String> filteredGenres = genres.where((g) => g != 'Non-Fiction').toList();
+    
+      // If all genres were 'Non-Fiction', use the original list to avoid empty query
+      if (filteredGenres.isEmpty) {
+        filteredGenres = genres;
+      }
+    
+      // Create a query to get books with overlapping genres, excluding the current book
       final response = await supabase
           .from('books')
           .select()
           .neq('id', bookId)
-          .overlaps('genres', genres)
+          .overlaps('genres', filteredGenres) // Use filtered genres for the query
           .order('created_at', ascending: false)
-          .limit(limit);
+          .limit(limit * 2); // Fetch more books to have enough after sorting
 
-      final List<BookModel> allSimilarBooks =
+      final List<BookModel> allBooks =
           response.map<BookModel>((book) => BookModel.fromJson(book)).toList();
 
-      // Sort by number of matching genres
-      allSimilarBooks.sort((a, b) {
-        int matchesA = a.genres?.where((g) => genres.contains(g)).length ?? 0;
-        int matchesB = b.genres?.where((g) => genres.contains(g)).length ?? 0;
-        return matchesB.compareTo(matchesA);
-      });
+      // Calculate matching score for each book (excluding 'Non-Fiction')
+      final List<Map<String, dynamic>> scoredBooks = allBooks.map((book) {
+        int matchCount = 0;
+        if (book.genres != null) {
+          for (String genre in book.genres!) {
+            if (genre != 'Non-Fiction' && filteredGenres.contains(genre)) {
+              matchCount++;
+            }
+          }
+        }
+        return {
+          'book': book,
+          'matchCount': matchCount,
+        };
+      }).toList();
 
-      return allSimilarBooks;
+      // Sort by match count in descending order
+      scoredBooks.sort((a, b) => b['matchCount'].compareTo(a['matchCount']));
+
+      // Take the top 'limit' books
+      final List<BookModel> sortedBooks = scoredBooks
+          .take(limit)
+          .map((item) => item['book'] as BookModel)
+          .toList();
+
+      return sortedBooks;
     } catch (e) {
       debugPrint('Error fetching similar books: $e');
       return [];

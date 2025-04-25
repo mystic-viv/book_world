@@ -1,5 +1,6 @@
 import 'package:book_world/models/book_model.dart';
 import 'package:book_world/routes/route.dart';
+import 'package:book_world/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:book_world/services/book_service.dart';
 import 'package:get/route_manager.dart';
@@ -31,7 +32,6 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
     await _bookService.recordBookInteraction(widget.book.id, 'view');
   }
 
-
   Future<void> _checkIfBookIsSaved() async {
     final isSaved = await _bookService.isBookSaved(widget.book.id);
     if (mounted) {
@@ -45,7 +45,7 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
   Future<void> _toggleSave() async {
     if (_isLoading) return;
 
-   if (mounted) {
+    if (mounted) {
       // Add this check
       setState(() => _isLoading = true);
     }
@@ -55,7 +55,7 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
       } else {
         await _bookService.saveBook(widget.book.id);
       }
-       if (mounted) {
+      if (mounted) {
         // Add this check
         setState(() => _isSaved = !_isSaved);
       }
@@ -71,7 +71,7 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
 
   Future<void> _fetchSimilarBooks() async {
     if (widget.book.genres == null || widget.book.genres!.isEmpty) {
-       if (mounted) {
+      if (mounted) {
         // Add this check
         setState(() => _isLoading = false);
       }
@@ -85,18 +85,37 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
         limit: 10,
       );
 
-       if (mounted) {  // Add this check
-      setState(() {
-        _similarBooks = similarBooks;
-        _isLoading = false;
-      });
-    }
+      if (mounted) {
+        // Add this check
+        setState(() {
+          _similarBooks = similarBooks;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint('Error fetching similar books: $e');
       if (mounted) {
         // Add this check
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  @override
+  void didUpdateWidget(BookDescriptionScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // If the book has changed, reload the data
+    if (oldWidget.book.id != widget.book.id) {
+      setState(() {
+        _isLoading = true;
+        _similarBooks = [];
+        _isSaved = false;
+      });
+    
+      _fetchSimilarBooks();
+      _checkIfBookIsSaved();
+      _recordBookView();
     }
   }
 
@@ -300,20 +319,23 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
                             border: Border.all(color: Colors.orange),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: _isLoading 
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.orange,
+                                    ),
+                                  )
+                                  : Icon(
+                                    _isSaved
+                                        ? Icons.bookmark
+                                        : Icons.bookmark_border,
                                     color: Colors.orange,
+                                    size: 24,
                                   ),
-                                )
-                              : Icon(
-                                  _isSaved ? Icons.bookmark : Icons.bookmark_border,
-                                  color: Colors.orange,
-                                  size: 24,
-                                ),
                         ),
                       ),
                     ],
@@ -332,11 +354,24 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
                           onPressed:
                               widget.book.availableCopies > 0
                                   ? () {
-                                    // Implement borrow functionality
+                                    Get.snackbar(
+                                      "Information",
+                                      "Still in Development",
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: Colors.blue.shade100,
+                                      colorText: Colors.blue.shade800,
+                                      margin: const EdgeInsets.all(16),
+                                      borderRadius: 8,
+                                      duration: const Duration(seconds: 3),
+                                      icon: Icon(
+                                        Icons.error_outline,
+                                        color: Colors.blue.shade800,
+                                      ),
+                                    );
                                   }
                                   : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.lightGreen,
+                            backgroundColor: Colors.blue[100],
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -347,7 +382,7 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Colors.blue,
                             ),
                           ),
                         ),
@@ -358,7 +393,7 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
                           child: ElevatedButton(
                             onPressed: () {
                               // Implemented read functionality
-                               Routes.toPdfViewer(
+                              Routes.toPdfViewer(
                                 bookId: widget.book.id,
                                 bookTitle: widget.book.bookName,
                                 pdfUrl: widget.book.pdfUrl,
@@ -371,7 +406,7 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
+                              backgroundColor: Colors.green[100],
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -382,7 +417,7 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: Colors.green,
                               ),
                             ),
                           ),
@@ -434,74 +469,235 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
 
-                      // Similar Books Section
-                      const Text(
-                        'Similar Books',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange,
+                // Similar Books Section
+                Container(
+                  width: double.infinity,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left:20),
+                        child: const Text(
+                                                  'Similar Books',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFE8C6),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child:
-                            _isLoading
-                                ? const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(20),
-                                    child: CircularProgressIndicator(
-                                      color: Colors.orange,
-                                    ),
-                                  ),
-                                )
-                                : _similarBooks.isEmpty
-                                ? const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(20),
-                                    child: Text(
-                                      'No similar books found',
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                  ),
-                                )
-                                : SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  padding: const EdgeInsets.all(20),
-                                  child: Row(
-                                    children:
-                                        _similarBooks.map((similarBook) {
-                                          int matchingGenres =
-                                              similarBook.genres
-                                                  ?.where(
-                                                    (g) => widget.book.genres!
-                                                        .contains(g),
-                                                  )
-                                                  .length ??
-                                              0;
+                      _isLoading
+                          ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: CircularProgressIndicator(
+                                color: Colors.orange,
+                              ),
+                            ),
+                          )
+                          : _similarBooks.isEmpty
+                          ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Text(
+                                'No similar books found',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          )
+                          : Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFE8C6),
+                            ),
+                            child: SizedBox(
+                              // For 1:1.5 aspect ratio, height = width * 1.5
+                              height:
+                                  (MediaQuery.of(context).size.width -
+                                      32 -
+                                      20) /
+                                  3 *
+                                  1.5,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _similarBooks.length,
+                                itemBuilder: (context, index) {
+                                  final book = _similarBooks[index];
+                                  // Calculate matching genres for display
+                                  int matchingGenres =
+                                      book.genres
+                                          ?.where(
+                                            (g) =>
+                                                widget.book.genres!.contains(g),
+                                          )
+                                          .length ??
+                                      0;
 
-                                          return Tooltip(
-                                            message:
-                                                '$matchingGenres matching ${matchingGenres == 1 ? 'genre' : 'genres'}',
-                                            child: SimilarBookCard(
-                                              imageUrl:
-                                                  similarBook.coverUrl ?? '',
-                                              title: similarBook.bookName,
+                                  // Set the width to match the grid items (screen width / 3 - spacing)
+                                  final itemWidth =
+                                      (MediaQuery.of(context).size.width -
+                                          32 -
+                                          20) /
+                                      3;
+
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      // Navigate to book details
+                                      await Get.toNamed(
+                                        RouteNames.bookDescription,
+                                        arguments: book,
+                                        preventDuplicates:
+                                            false, // Allow duplicate routes
+                                      );
+
+                                      debugPrint(
+                                        'Selected similar book: ${book.bookName}',
+                                      );
+                                    },
+                                    child: Container(
+                                      width: itemWidth,
+                                      margin: const EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.vertical(
+                                                    top: Radius.circular(10),
+                                                  ),
+                                              child:
+                                                  book.coverUrl != null
+                                                      ? Image.network(
+                                                        book.coverUrl!,
+                                                        width: double.infinity,
+                                                        height: double.infinity,
+                                                        fit: BoxFit.cover,
+                                                        alignment:
+                                                            Alignment.topCenter,
+                                                        errorBuilder: (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          debugPrint(
+                                                            'Error loading image: $error',
+                                                          );
+                                                          return Container(
+                                                            color: Colors.grey,
+                                                            child: Center(
+                                                              child: Icon(
+                                                                Icons
+                                                                    .broken_image,
+                                                                size: 30,
+                                                                color:
+                                                                    Colors
+                                                                        .grey[600],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                      : Container(
+                                                        color: Colors.grey[300],
+                                                        child: Center(
+                                                          child: Icon(
+                                                            Icons.book,
+                                                            size: 30,
+                                                            color:
+                                                                Colors
+                                                                    .grey[600],
+                                                          ),
+                                                        ),
+                                                      ),
                                             ),
-                                          );
-                                        }).toList(),
-                                  ),
-                                ),
-                      ),
-                      const SizedBox(height: 32),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(6.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  book.bookName,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 10,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  book.authorName,
+                                                  style: TextStyle(
+                                                    fontSize: 8,
+                                                    color: Colors.grey[600],
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                const SizedBox(height: 2),
+                                                // Show matching genres count
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 4,
+                                                        vertical: 2,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.green
+                                                        .withOpacity(0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          4,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    '$matchingGenres matching ${matchingGenres == 1 ? 'genre' : 'genres'}',
+                                                    style: const TextStyle(
+                                                      fontSize: 7,
+                                                      color: Colors.green,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                    ],
+                  ),
+                ),
 
-                      // Ratings Section
+                // Ratings Section
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       const Text(
                         'Ratings',
                         style: TextStyle(
@@ -529,63 +725,6 @@ class _BookDescriptionScreenState extends State<BookDescriptionScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class SimilarBookCard extends StatelessWidget {
-  final String imageUrl;
-  final String title;
-
-  const SimilarBookCard({
-    super.key,
-    required this.imageUrl,
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(right: 16),
-      width: 80,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 120,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(40),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.book, size: 30),
-                  );
-                },
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
       ),
     );
   }
@@ -621,28 +760,31 @@ class ReviewCard extends StatelessWidget {
               Text(
                 name,
                 style: const TextStyle(
-                  fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
               Text(
                 date,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(color: Colors.grey[600], fontSize: 14),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Row(
-            children: List.generate(5, (index) {
-              return Icon(
+            children: List.generate(
+              5,
+              (index) => Icon(
                 index < rating ? Icons.star : Icons.star_border,
                 color: Colors.orange,
                 size: 20,
-              );
-            }),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            style: TextStyle(color: Colors.grey[700], height: 1.5),
           ),
         ],
       ),

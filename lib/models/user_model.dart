@@ -11,6 +11,7 @@ class UserModel {
   final String? profilePictureUrl;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String password;
 
   UserModel({
     required this.id,
@@ -25,6 +26,7 @@ class UserModel {
     this.profilePictureUrl,
     required this.createdAt,
     required this.updatedAt,
+    required this.password,
   });
 
   // Create from JSON (from Supabase)
@@ -51,6 +53,7 @@ class UserModel {
           json['updated_at'] != null
               ? DateTime.parse(json['updated_at'])
               : DateTime.now(),
+      password: json['password'],
     );
   }
 
@@ -69,6 +72,7 @@ class UserModel {
       'profile_picture_url': profilePictureUrl,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'password': password,
     };
   }
 
@@ -86,6 +90,7 @@ class UserModel {
     String? profilePictureUrl,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? password,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -100,6 +105,7 @@ class UserModel {
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      password: password ?? this.password,
     );
   }
 

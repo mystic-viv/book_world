@@ -80,13 +80,13 @@ class AuthController extends GetxController {
       }
     } on AuthException catch (error) {
       signupLoading.value = false;
-      showSnackBar("Error", error.message); // Show error message
+      showSnackBar("Error", error.message, isError: true); // Show error message
     } catch (error) {
       signupLoading.value = false;
       print("Signup error: $error");
       showSnackBar(
         "Error",
-        "Something went wrong. Please try again.",
+        "Something went wrong. Please try again.", isError: true
       ); // Handle unexpected errors
     }
   }
@@ -101,7 +101,7 @@ class AuthController extends GetxController {
         loginLoading.value = false;
 
         if (response.user != null) {
-          showSnackBar("Success", "Logged in successfully!");
+          showSnackBar("Success", "Logged in successfully!", isError: true);
         
           // Check user role and navigate accordingly
           final userRole = AuthService.getUserRole();
@@ -114,11 +114,11 @@ class AuthController extends GetxController {
       } on AuthException catch (error) {
         loginLoading.value = false;
         print("AuthException: ${error.message}");
-        showSnackBar("Error", error.message);
+        showSnackBar("Error", error.message, isError: true);
       } catch (error) {
         loginLoading.value = false;
         print("Login error: $error");
-        showSnackBar("Error", "Something went wrong. Please try again.");
+        showSnackBar("Error", "Something went wrong. Please try again.", isError: true);
       }
     }
   // * Logout Function
@@ -133,7 +133,7 @@ class AuthController extends GetxController {
       Get.offAllNamed(RouteNames.login);
     } catch (error) {
       print("Logout error: $error");
-      showSnackBar("Error", "Something went wrong during logout.");
+      showSnackBar("Error", "Something went wrong during logout.", isError: true);
     }
   }
 
@@ -145,14 +145,14 @@ class AuthController extends GetxController {
       librarianCheckLoading.value = false;
       
       if (!isLibrarian) {
-        showSnackBar("Error", "Email not found in librarian records");
+        showSnackBar("Error", "Email not found in librarian records", isError: true);
       }
       
       return isLibrarian;
     } catch (error) {
       librarianCheckLoading.value = false;
       print("Librarian check error: $error");
-      showSnackBar("Error", "Failed to verify librarian status");
+      showSnackBar("Error", "Failed to verify librarian status",isError: true);
       return false;
     }
   }
@@ -176,13 +176,14 @@ class AuthController extends GetxController {
       }
     } on AuthException catch (error) {
       librarianSignupLoading.value = false;
-      showSnackBar("Error", error.message); // Show error message
+      showSnackBar("Error", error.message, isError: true); // Show error message
     } catch (error) {
       librarianSignupLoading.value = false;
       print("Librarian signup error: $error");
       showSnackBar(
         "Error",
         "Something went wrong. Please try again.",
+        isError: true
       ); // Handle unexpected errors
     }
   }
@@ -233,7 +234,7 @@ class AuthController extends GetxController {
       } catch (error) {
         resetPasswordLoading.value = false;
         print("Password reset error: $error");
-        showSnackBar("Error", "Failed to send password reset email. Please try again.");
+        showSnackBar("Error", "Failed to send password reset email. Please try again.", isError: true);
       }
     }
 
@@ -255,7 +256,7 @@ class AuthController extends GetxController {
       } catch (error) {
         confirmResetLoading.value = false;
         print("Password reset confirmation error: $error");
-        showSnackBar("Error", "Failed to reset password. Please try again.");
+        showSnackBar("Error", "Failed to reset password. Please try again.", isError: true);
       }
     }
   }
