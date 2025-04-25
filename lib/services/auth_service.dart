@@ -194,7 +194,7 @@ class AuthService {
       final userData =
           await client!
               .from('users')
-              .select('custom_id, role, username, name')
+              .select('custom_id, role, username, name, profile_picture_url')
               .eq('id', response.user!.id)
               .maybeSingle();
 
@@ -206,6 +206,7 @@ class AuthService {
           'email': response.user!.email,
           'username': userData['username'],
           'name': userData['name'],
+          'profile_picture_url': userData['profile_picture_url'],
           'role': userData['role'],
           'token': response.session?.accessToken,
         });
@@ -292,7 +293,7 @@ class AuthService {
       final userData =
           await client!
               .from('users')
-              .select('custom_id, role, username, name')
+              .select('custom_id, role, username, name, profile_picture_url')
               .eq('id', user.id)
               .maybeSingle(); // Use maybeSingle instead of single
 
@@ -304,6 +305,7 @@ class AuthService {
           'email': user.email,
           'username': userData['username'],
           'name': userData['name'],
+          'profile_picture_url': userData['profile_picture_url'],
           'role': userData['role'],
           'token': session.accessToken,
         });

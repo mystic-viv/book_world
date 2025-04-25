@@ -47,10 +47,10 @@ class PDFAppBar extends StatelessWidget implements PreferredSizeWidget {
           // Text selection toggle button
           Obx(() => IconButton(
             icon: Icon(
-              controller.enableTextSelection.value
-                  ? Icons.text_fields
-                  : Icons.text_fields_outlined,
-              color: Colors.orange,
+              Icons.text_fields,
+              color: controller.enableTextSelection.value
+                  ? Colors.orange
+                  : Colors.grey,
             ),
             onPressed: controller.toggleTextSelection,
             tooltip: 'Toggle text selection',

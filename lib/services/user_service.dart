@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
 import 'package:book_world/models/user_model.dart';
 import 'package:book_world/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,13 +19,13 @@ class UserService {
   // Get current user
   Future<UserModel?> getCurrentUser() async {
     try {
-      if (!isLoggedIn) return null;
+      if (!isLoggedIn || currentUserId == null) return null;
 
       final response = await _supabase
           ?.from('users')
           .select()
           .eq('id', currentUserId!)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to avoid errors if no record is found
 
       if (response == null) return null;
 
@@ -37,13 +39,8 @@ class UserService {
   // Get user by ID
   Future<UserModel?> getUserById(String userId) async {
     try {
-      final response = await _supabase
-          !.from('users')
-          .select()
-          .eq('id', userId)
-          .single();
-
-      if (response == null) return null;
+      final response =
+          await _supabase!.from('users').select().eq('id', userId).single();
 
       return UserModel.fromJson(response);
     } catch (e) {
@@ -76,13 +73,12 @@ class UserService {
         'updated_at': DateTime.now().toIso8601String(),
       };
 
-
       // Add updated_at timestamp
       updateData['updated_at'] = DateTime.now().toIso8601String();
 
       // Update user in the database
-      await _supabase
-          !.from('users')
+      await _supabase!
+          .from('users')
           .update(updateData)
           .eq('id', currentUserId!);
 
@@ -94,7 +90,10 @@ class UserService {
   }
 
   // Update user password
-  Future<bool> updateUserPassword(String currentPassword, String newPassword) async {
+  Future<bool> updateUserPassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
     try {
       if (!isLoggedIn) return false;
 
@@ -103,19 +102,19 @@ class UserService {
       if (user == null) return false;
 
       // Update the password using Supabase Auth API
-      await _supabase.auth.updateUser(
-        UserAttributes(
-          password: newPassword,
-        ),
-      );
+      await _supabase.auth.updateUser(UserAttributes(password: newPassword));
 
       // Show success message
       showSnackBar("Success", "Password updated successfully", isError: false);
-      
+
       return true;
     } catch (e) {
       debugPrint('Error updating password: $e');
-      showSnackBar("Error", "Failed to update password: ${e.toString()}", isError: true);
+      showSnackBar(
+        "Error",
+        "Failed to update password: ${e.toString()}",
+        isError: true,
+      );
       return false;
     }
   }
@@ -126,11 +125,7 @@ class UserService {
       if (!isLoggedIn) return false;
 
       // Update email in auth
-      await _supabase!.auth.updateUser(
-        UserAttributes(
-          email: newEmail,
-        ),
-      );
+      await _supabase!.auth.updateUser(UserAttributes(email: newEmail));
 
       // Update email in users table
       await _supabase
@@ -141,11 +136,19 @@ class UserService {
           })
           .eq('id', currentUserId!);
 
-      showSnackBar("Success", "Email updated successfully. Please verify your new email.", isError: false);
+      showSnackBar(
+        "Success",
+        "Email updated successfully. Please verify your new email.",
+        isError: false,
+      );
       return true;
     } catch (e) {
       debugPrint('Error updating email: $e');
-      showSnackBar("Error", "Failed to update email: ${e.toString()}", isError: true);
+      showSnackBar(
+        "Error",
+        "Failed to update email: ${e.toString()}",
+        isError: true,
+      );
       return false;
     }
   }
@@ -171,33 +174,43 @@ class UserService {
   }
 
   // Upload profile picture to storage and get URL
- /* Future<String?> uploadProfilePicture(List<int> fileBytes, String fileName) async {
-    try {
-      if (!isLoggedIn) return null;
+  Future<void> selectAndUploadProfilePicture() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-      // Create a unique file path
-      final filePath = 'profile_pictures/$currentUserId/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+    if (image != null) {
+      // Read the image as bytes
+      final Uint8List fileBytes = await image.readAsBytes();
 
-      // Upload the file
-      await _supabase!.storage
-          .from('user_uploads')
-          .uploadBinary(
-            filePath,
-            fileBytes,
-            fileOptions: const FileOptions(contentType: 'image/jpeg'), // Adjust content type as needed
-          );
+      // Get the file name from the path
+      final String fileName = image.name;
 
-      // Get the public URL
-      final imageUrl = _supabase.storage
-          .from('user_uploads')
-          .getPublicUrl(filePath);
+      // Use the existing service method to upload
+      final UserService userService = UserService();
+      final String? imageUrl = await userService.uploadProfilePicture(
+        fileBytes,
+        fileName,
+      );
 
-      return imageUrl;
-    } catch (e) {
-      debugPrint('Error uploading profile picture: $e');
-      return null;
+      if (imageUrl != null) {
+        // Update the user's profile with the new image URL
+        await userService.updateProfilePicture(imageUrl);
+        // Show success message
+        showSnackBar(
+          "Success",
+          "Profile picture updated successfully",
+          isError: false,
+        );
+      } else {
+        // Show error message
+        showSnackBar(
+          "Error",
+          "Failed to upload profile picture",
+          isError: true,
+        );
+      }
     }
-  }*/
+  }
 
   // Delete user account
   Future<bool> deleteUserAccount(String password) async {
@@ -218,10 +231,7 @@ class UserService {
       // Delete user from the database
       // Note: You might want to use a cascade delete trigger in your database
       // or handle related data deletion here
-      await _supabase
-          .from('users')
-          .delete()
-          .eq('id', currentUserId!);
+      await _supabase.from('users').delete().eq('id', currentUserId!);
 
       // Delete user from auth
       await _supabase.auth.admin.deleteUser(currentUserId!);
@@ -230,7 +240,11 @@ class UserService {
       return true;
     } catch (e) {
       debugPrint('Error deleting user account: $e');
-      showSnackBar("Error", "Failed to delete account: ${e.toString()}", isError: true);
+      showSnackBar(
+        "Error",
+        "Failed to delete account: ${e.toString()}",
+        isError: true,
+      );
       return false;
     }
   }
@@ -238,11 +252,12 @@ class UserService {
   // Check if username is available
   Future<bool> isUsernameAvailable(String username) async {
     try {
-      final response = await _supabase!
-          .from('users')
-          .select('username')
-          .eq('username', username)
-          .maybeSingle();
+      final response =
+          await _supabase!
+              .from('users')
+              .select('username')
+              .eq('username', username)
+              .maybeSingle();
 
       // If response is null, username is available
       return response == null;
@@ -255,11 +270,12 @@ class UserService {
   // Check if mobile number is available
   Future<bool> isMobileAvailable(String mobile) async {
     try {
-      final response = await _supabase!
-          .from('users')
-          .select('mobile')
-          .eq('mobile', mobile)
-          .maybeSingle();
+      final response =
+          await _supabase!
+              .from('users')
+              .select('mobile')
+              .eq('mobile', mobile)
+              .maybeSingle();
 
       // If response is null, mobile is available
       return response == null;
@@ -274,11 +290,12 @@ class UserService {
     try {
       if (!isLoggedIn) return null;
 
-      final response = await _supabase!
-          .from('users')
-          .select('role')
-          .eq('id', currentUserId!)
-          .single();
+      final response =
+          await _supabase!
+              .from('users')
+              .select('role')
+              .eq('id', currentUserId!)
+              .single();
 
       return response['role'] as String?;
     } catch (e) {
@@ -297,5 +314,46 @@ class UserService {
   Future<bool> isLibrarian() async {
     final role = await getUserRole();
     return role == 'librarian';
+  }
+
+  // Upload profile picture to storage and get URL
+  Future<String?> uploadProfilePicture(
+    Uint8List fileBytes,
+    String fileName,
+  ) async {
+    try {
+      if (!isLoggedIn) return null;
+
+      // Create a unique file path
+      final filePath =
+          'profile_pictures/$currentUserId/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+    
+      // Determine content type based on file extension
+      String contentType = 'image/jpeg'; // Default
+      if (fileName.toLowerCase().endsWith('.png')) {
+        contentType = 'image/png';
+      } else if (fileName.toLowerCase().endsWith('.webp')) {
+        contentType = 'image/webp';
+      }
+
+      // Upload the file
+      await _supabase!.storage
+          .from('user-profiles')
+          .uploadBinary(
+            filePath,
+            fileBytes,
+            fileOptions: FileOptions(contentType: contentType), // Dynamic content type
+          );
+
+      // Get the public URL
+      final imageUrl = _supabase.storage
+          .from('user-profiles')
+          .getPublicUrl(filePath);
+
+      return imageUrl;
+    } catch (e) {
+      debugPrint('Error uploading profile picture: $e');
+      return null;
+    }
   }
 }

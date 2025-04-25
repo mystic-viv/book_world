@@ -101,7 +101,7 @@ class AuthController extends GetxController {
         loginLoading.value = false;
 
         if (response.user != null) {
-          showSnackBar("Success", "Logged in successfully!", isError: true);
+          showSnackBar("Success", "Logged in successfully!");
         
           // Check user role and navigate accordingly
           final userRole = AuthService.getUserRole();
