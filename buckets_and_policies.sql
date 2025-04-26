@@ -4,6 +4,9 @@ supabase storage create book-covers
 -- Create a bucket for storing book PDFs
 supabase storage create book-pdfs
 
+-- Create a bucket for storing user profile images
+supabase storage create user-profiles
+
 -- For the book-pdfs bucket
 -- Allow public read access to book covers
 CREATE POLICY "Public Read Access for book-covers"
@@ -97,4 +100,48 @@ USING (
     SELECT 1 FROM librarians
     WHERE librarians.id = auth.uid() AND librarians.is_active = true
   )
+);
+
+-- For the user-profiles bucket
+-- Allow only users to read profile images
+CREATE POLICY "Allow public access to profile pictures" 
+ON storage.objects 
+FOR SELECT 
+TO public 
+USING (
+  bucket_id = 'user-profiles' AND 
+  (storage.foldername(name))[1] = 'profile_pictures'
+);
+
+-- Allow only authenticated users to upload profile images
+CREATE POLICY "Allow authenticated users to upload their own profile pictures" 
+ON storage.objects 
+FOR INSERT 
+TO authenticated 
+WITH CHECK (
+  bucket_id = 'user-profiles' AND 
+  (storage.foldername(name))[1] = 'profile_pictures' AND
+  (storage.foldername(name))[2] = auth.uid()::text
+);
+
+--Allow users to update thier own profile pictures
+CREATE POLICY "Allow users to update their own profile pictures" 
+ON storage.objects 
+FOR UPDATE 
+TO authenticated 
+USING (
+  bucket_id = 'user-profiles' AND 
+  (storage.foldername(name))[1] = 'profile_pictures' AND
+  (storage.foldername(name))[2] = auth.uid()::text
+);
+
+-- Allow users to delete their own profile pictures
+CREATE POLICY "Allow users to delete their own profile pictures" 
+ON storage.objects 
+FOR DELETE 
+TO authenticated 
+USING (
+  bucket_id = 'user-profiles' AND 
+  (storage.foldername(name))[1] = 'profile_pictures' AND
+  (storage.foldername(name))[2] = auth.uid()::text
 );

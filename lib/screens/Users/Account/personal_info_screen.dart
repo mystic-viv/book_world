@@ -13,11 +13,18 @@ class PersonalInfoScreen extends StatefulWidget {
 }
 
 class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
+final FocusNode _username = FocusNode();
+  final FocusNode _fullname = FocusNode();
+  final FocusNode _mobile = FocusNode();
+  // final FocusNode _dob = FocusNode();
+  final FocusNode _localAddress = FocusNode();
+  final FocusNode _permanentAddress = FocusNode();
+
   final UserService _userService = UserService();
   UserModel? _user;
   bool _isLoading = true;
   bool _isEditing = false;
-  
+
   // Form controllers
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
@@ -40,6 +47,16 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   void initState() {
     super.initState();
     _loadUserData();
+    _username.addListener(_handleFocusChange);
+    _fullname.addListener(_handleFocusChange);
+    _localAddress.addListener(_handleFocusChange);
+    _permanentAddress.addListener(_handleFocusChange);
+  }
+
+void _handleFocusChange() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -54,6 +71,16 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     _confirmPasswordController.dispose();
     _newEmailController.dispose();
     _passwordForEmailController.dispose();
+    _username.removeListener(_handleFocusChange);
+    _fullname.removeListener(_handleFocusChange);
+    _mobile.removeListener(_handleFocusChange);
+    _localAddress.removeListener(_handleFocusChange);
+    _permanentAddress.removeListener(_handleFocusChange);
+    _username.dispose();
+    _fullname.dispose();
+    _mobile.dispose();
+    _localAddress.dispose();
+    _permanentAddress.dispose();
     super.dispose();
   }
 
@@ -134,11 +161,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         permanentAddress: _permanentAddressController.text,
         profilePictureUrl: _user!.profilePictureUrl,
         createdAt: _user!.createdAt,
-        updatedAt: DateTime.now(), 
+        updatedAt: DateTime.now(),
       );
 
       final success = await _userService.updateUserProfile(updatedUser);
-      
+
       setState(() {
         _isLoading = false;
         _isEditing = false;
@@ -156,157 +183,170 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   void _showChangePasswordDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Change Password'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _currentPasswordController,
-                decoration: const InputDecoration(labelText: 'Current Password'),
-                obscureText: true,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Change Password'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _currentPasswordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Current Password',
+                    ),
+                    obscureText: true,
+                  ),
+                  TextField(
+                    controller: _newPasswordController,
+                    decoration: const InputDecoration(
+                      labelText: 'New Password',
+                    ),
+                    obscureText: true,
+                  ),
+                  TextField(
+                    controller: _confirmPasswordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Confirm New Password',
+                    ),
+                    obscureText: true,
+                  ),
+                ],
               ),
-              TextField(
-                controller: _newPasswordController,
-                decoration: const InputDecoration(labelText: 'New Password'),
-                obscureText: true,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
               ),
-              TextField(
-                controller: _confirmPasswordController,
-                decoration: const InputDecoration(labelText: 'Confirm New Password'),
-                obscureText: true,
+              TextButton(
+                onPressed: () async {
+                  if (_newPasswordController.text !=
+                      _confirmPasswordController.text) {
+                    showSnackBar(
+                      'Error',
+                      'Passwords do not match',
+                      isError: true,
+                    );
+                    return;
+                  }
+
+                  Navigator.pop(context);
+                  setState(() {
+                    _isLoading = true;
+                  });
+
+                  final success = await _userService.updateUserPassword(
+                    _currentPasswordController.text,
+                    _newPasswordController.text,
+                  );
+
+                  setState(() {
+                    _isLoading = false;
+                  });
+
+                  // Clear password fields
+                  _currentPasswordController.clear();
+                  _newPasswordController.clear();
+                  _confirmPasswordController.clear();
+                },
+                child: const Text('Update'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              if (_newPasswordController.text != _confirmPasswordController.text) {
-                showSnackBar('Error', 'Passwords do not match', isError: true);
-                return;
-              }
-              
-              Navigator.pop(context);
-              setState(() {
-                _isLoading = true;
-              });
-              
-              final success = await _userService.updateUserPassword(
-                _currentPasswordController.text,
-                _newPasswordController.text,
-              );
-              
-              setState(() {
-                _isLoading = false;
-              });
-              
-              // Clear password fields
-              _currentPasswordController.clear();
-              _newPasswordController.clear();
-              _confirmPasswordController.clear();
-            },
-            child: const Text('Update'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showChangeEmailDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Change Email'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _newEmailController,
-                decoration: const InputDecoration(labelText: 'New Email'),
-                keyboardType: TextInputType.emailAddress,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Change Email'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _newEmailController,
+                    decoration: const InputDecoration(labelText: 'New Email'),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  TextField(
+                    controller: _passwordForEmailController,
+                    decoration: const InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                  ),
+                ],
               ),
-              TextField(
-                controller: _passwordForEmailController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  setState(() {
+                    _isLoading = true;
+                  });
+
+                  final success = await _userService.updateUserEmail(
+                    _newEmailController.text,
+                    _passwordForEmailController.text,
+                  );
+
+                  setState(() {
+                    _isLoading = false;
+                  });
+
+                  // Clear fields
+                  _newEmailController.clear();
+                  _passwordForEmailController.clear();
+
+                  if (success) {
+                    _loadUserData(); // Refresh data
+                  }
+                },
+                child: const Text('Update'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              setState(() {
-                _isLoading = true;
-              });
-              
-              final success = await _userService.updateUserEmail(
-                _newEmailController.text,
-                _passwordForEmailController.text,
-              );
-              
-              setState(() {
-                _isLoading = false;
-              });
-              
-              // Clear fields
-              _newEmailController.clear();
-              _passwordForEmailController.clear();
-              
-              if (success) {
-                _loadUserData(); // Refresh data
-              }
-            },
-            child: const Text('Update'),
-          ),
-        ],
-      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Personal Information'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Get.back(),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Personal Information',style: TextStyle(color: Colors.orange)),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.orange),
+            onPressed: () => Get.back(),
+          ),
+          actions: [
+            if (!_isEditing)
+              IconButton(
+                icon: const Icon(Icons.edit,color: Colors.orange),
+                onPressed: () {
+                  setState(() {
+                    _isEditing = true;
+                  });
+                },
+              )
+            else
+              IconButton(icon: const Icon(Icons.save,color: Colors.orange), onPressed: _saveChanges),
+          ],
         ),
-        actions: [
-          if (!_isEditing)
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                setState(() {
-                  _isEditing = true;
-                });
-              },
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.save),
-              onPressed: _saveChanges,
-            ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _user == null
-              ? const Center(child: Text('Unable to load user data'))
-              : SingleChildScrollView(
+        body:
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _user == null
+                ? const Center(child: Text('Unable to load user data'))
+                : SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,6 +364,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.orange,
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -332,7 +373,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const Text(
                                           'Email',
@@ -347,7 +389,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                   ),
                                   TextButton(
                                     onPressed: _showChangeEmailDialog,
-                                    child: const Text('Change'),
+                                    child: const Text(
+                                      'Change',
+                                      style: TextStyle(color: Colors.orange),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -364,7 +409,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                   ),
                                   TextButton(
                                     onPressed: _showChangePasswordDialog,
-                                    child: const Text('Change'),
+                                    child: const Text(
+                                      'Change',
+                                      style: TextStyle(color: Colors.orange),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -372,7 +420,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                           ),
                         ),
                       ),
-                      
+      
                       // Personal information form
                       Form(
                         key: _formKey,
@@ -387,14 +435,29 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.orange,
                                   ),
                                 ),
+      
                                 const SizedBox(height: 16),
                                 TextFormField(
+                                  focusNode: _username,
                                   controller: _usernameController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Username',
-                                    border: OutlineInputBorder(),
+                                    floatingLabelStyle: TextStyle(
+                                      color:
+                                          _username.hasFocus
+                                              ? Colors.orange
+                                              : null,
+                                    ),
+                                    border: const OutlineInputBorder(),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.orange,
+                                        width: 2.0,
+                                      ),
+                                    ),
                                   ),
                                   enabled: _isEditing,
                                   validator: (value) {
@@ -404,12 +467,26 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                     return null;
                                   },
                                 ),
+      
                                 const SizedBox(height: 16),
                                 TextFormField(
+                                  focusNode: _fullname,
                                   controller: _nameController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Full Name',
-                                    border: OutlineInputBorder(),
+                                    floatingLabelStyle: TextStyle(
+                                      color:
+                                          _fullname.hasFocus
+                                              ? Colors.orange
+                                              : null,
+                                    ),
+                                    border: const OutlineInputBorder(),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.orange,
+                                        width: 2.0,
+                                      ),
+                                    ),
                                   ),
                                   enabled: _isEditing,
                                   validator: (value) {
@@ -419,47 +496,122 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                     return null;
                                   },
                                 ),
+      
                                 const SizedBox(height: 16),
                                 TextFormField(
+                                  focusNode: _mobile,
                                   controller: _mobileController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Mobile Number',
-                                    border: OutlineInputBorder(),
+                                    floatingLabelStyle: TextStyle(
+                                      color:
+                                          _mobile.hasFocus
+                                              ? Colors.orange
+                                              : null,
+                                    ),
+                                    border: const OutlineInputBorder(),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.orange,
+                                        width: 2.0,
+                                      ),
+                                    ),
                                   ),
                                   enabled: _isEditing,
                                   keyboardType: TextInputType.phone,
                                 ),
                                 const SizedBox(height: 16),
-                                InkWell(
-                                  onTap: _isEditing ? () => _selectDate(context) : null,
-                                  child: InputDecorator(
-                                    decoration: const InputDecoration(
-                                      labelText: 'Date of Birth',
-                                      border: OutlineInputBorder(),
+      
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    border: Border.all(
+                                      color:
+                                          _isEditing
+                                              ? Colors.grey
+                                              : Colors.grey.withOpacity(0.3),
                                     ),
-                                    child: Text(
-                                      _selectedDate == null
-                                          ? 'Select Date'
-                                          : DateFormat('yyyy-MM-dd').format(_selectedDate!),
+                                  ),
+                                  child: InkWell(
+                                    onTap:
+                                        _isEditing
+                                            ? () => _selectDate(context)
+                                            : null,
+                                    highlightColor:
+                                        _isEditing ? null : Colors.transparent,
+                                    splashColor:
+                                        _isEditing ? null : Colors.transparent,
+                                    child: InputDecorator(
+                                      decoration: InputDecoration(
+                                        labelText: 'Date of Birth',
+                                        border: InputBorder.none,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 8,
+                                            ),
+                                        enabled: _isEditing,
+                                      ),
+                                      child: Text(
+                                        _selectedDate == null
+                                            ? 'Select Date'
+                                            : DateFormat(
+                                              'yyyy-MM-dd',
+                                            ).format(_selectedDate!),
+                                        style: TextStyle(
+                                          color:
+                                              _isEditing
+                                                  ? Colors.black
+                                                  : Colors.black54,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
+      
                                 const SizedBox(height: 16),
                                 TextFormField(
+                                  focusNode: _localAddress,
                                   controller: _localAddressController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Local Address',
-                                    border: OutlineInputBorder(),
+                                    floatingLabelStyle: TextStyle(
+                                      color:
+                                          _localAddress.hasFocus
+                                              ? Colors.orange
+                                              : null,
+                                    ),
+                                    border: const OutlineInputBorder(),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.orange,
+                                        width: 2.0,
+                                      ),
+                                    ),
                                   ),
                                   enabled: _isEditing,
                                   maxLines: 2,
                                 ),
+      
                                 const SizedBox(height: 16),
                                 TextFormField(
+                                  focusNode: _permanentAddress,
                                   controller: _permanentAddressController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Permanent Address',
-                                    border: OutlineInputBorder(),
+                                    floatingLabelStyle: TextStyle(
+                                      color:
+                                          _permanentAddress.hasFocus
+                                              ? Colors.orange
+                                              : null,
+                                    ),
+                                    border: const OutlineInputBorder(),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.orange,
+                                        width: 2.0,
+                                      ),
+                                    ),
                                   ),
                                   enabled: _isEditing,
                                   maxLines: 2,
@@ -472,6 +624,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                     ],
                   ),
                 ),
+      ),
     );
   }
 }
