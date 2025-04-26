@@ -4,6 +4,7 @@ import 'package:book_world/middleware/role_middleware.dart';
 import 'package:book_world/models/book_model.dart';
 import 'package:book_world/routes/route_names.dart';
 import 'package:book_world/screens/Users/Account/account_screen.dart';
+import 'package:book_world/screens/Users/Account/personal_info_screen.dart';
 import 'package:book_world/screens/Users/book_description_screen.dart';
 import 'package:book_world/screens/Users/borrowed_books_screen.dart';
 import 'package:book_world/screens/Users/Home/genre_books_screen.dart';
@@ -66,6 +67,9 @@ class Routes {
       page: () => AccountScreen(),
       middlewares: [AuthMiddleware()],
     ),
+    GetPage(name: RouteNames.personalInfo,
+    page: () => const PersonalInfoScreen(),
+    middlewares: [AuthMiddleware()]),
 
     // Librarian routes
     GetPage(

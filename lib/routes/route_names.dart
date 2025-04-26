@@ -18,6 +18,7 @@ class RouteNames {
   static const String searchResults = '/search-results';
   static const String genreBooks = '/genre-books';
   static const String pdfViewer = '/pdf-viewer';
+  static const String personalInfo = '/personal-info';
 
   // Admin routes
   static const String adminDashboard = '/adminDashboard';

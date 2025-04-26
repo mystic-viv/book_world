@@ -218,7 +218,7 @@ class _AccountScreenState extends State<AccountScreen> {
     BuildContext context,
     String title,
     IconData icon,
-    Widget? screen,
+    String screen,
   ) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -240,14 +240,14 @@ class _AccountScreenState extends State<AccountScreen> {
         onTap: () {
           if (title == 'Log Out') {
             _confirmLogout(context);
-          } else if (screen != null) {
-            Get.to(() => screen); // Navigate to the screen directly
+          } else if (screen.isNotEmpty) {
+            Get.toNamed(screen); // Use the screen parameter directly
           }
         },
       ),
     );
-  }
 
+  }
   void _confirmLogout(BuildContext context) {
     showDialog(
       context: context,
@@ -362,34 +362,34 @@ class _AccountScreenState extends State<AccountScreen> {
                     context,
                     'Personal Info',
                     Icons.person_outline,
-                    null,
+                    RouteNames.personalInfo,
                   ),
                   _buildMenuItem(
                     context,
                     'Purchase History',
                     Icons.history,
-                    null,
+                    "",
                   ),
                   _buildMenuItem(
                     context,
                     'Borrowed Books',
                     Icons.book,
-                    const BorrowedBooksScreen(),
+                    RouteNames.borrowedBooks,
                   ),
-                  _buildMenuItem(context, 'Settings', Icons.settings, null),
+                  _buildMenuItem(context, 'Settings', Icons.settings, ""),
                   _buildMenuItem(
                     context,
                     'Invite a Friend',
                     Icons.person_add,
-                    null,
+                    "",
                   ),
                   _buildMenuItem(
                     context,
                     'Help & Support',
                     Icons.help_outline,
-                    null,
+                    "",
                   ),
-                  _buildMenuItem(context, 'Log Out', Icons.logout, null),
+                  _buildMenuItem(context, 'Log Out', Icons.logout, ""),
                 ],
               ),
             ),

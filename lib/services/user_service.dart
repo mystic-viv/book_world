@@ -23,15 +23,17 @@ class UserService {
 
       final response = await _supabase
           ?.from('users')
-          .select()
+          .select('*')
           .eq('id', currentUserId!)
-          .maybeSingle(); // Use maybeSingle instead of single to avoid errors if no record is found
+          .maybeSingle();
 
       if (response == null) return null;
-
+      debugPrint('User data from DB: ${response.toString()}');
       return UserModel.fromJson(response);
     } catch (e) {
       debugPrint('Error getting current user: $e');
+      // Print stack trace for better debugging
+      debugPrint(StackTrace.current.toString());
       return null;
     }
   }
