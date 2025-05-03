@@ -44,7 +44,7 @@ class UserModel {
               : null,
       localAddress: json['local_address'],
       permanentAddress: json['permanent_address'],
-      profilePictureUrl: json['profile_picture_url'],
+      profilePictureUrl: json['profile_picture_url'] ??  '',
       createdAt:
           json['created_at'] != null
               ? DateTime.parse(json['created_at'])

@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'package:book_world/utils/helper.dart';
 import 'package:intl/intl.dart';
 import 'package:book_world/services/storage_service.dart';
 import 'package:book_world/services/supabase_service.dart';
@@ -440,18 +441,22 @@ class AuthService {
       // Using Supabase to send password reset email
       await Supabase.instance.client.auth.resetPasswordForEmail(
         email,
-        redirectTo:
-            'io.supabase.book_world://reset_password-callback/', // Replace with your app's deep link
+        redirectTo: 'io.supabase.book_world://reset-password-callback',
       );
+      showSnackBar("Success", "Password reset link has been sent to your email");
     } catch (error) {
       print("AuthService resetPassword error: $error");
       rethrow; // Rethrow to be caught by the controller
     }
   }
-
   // Add this method to your AuthService class
-  static Future<void> confirmPasswordReset(String newPassword) async {
+  static Future<void> confirmPasswordReset(
+    String newPassword,
+    String accessToken,
+  ) async {
     try {
+      // final response = await Supabase.instance.client;
+      await Supabase.instance.client.auth.setSession(accessToken);
       // Update the user's password using Supabase
       await Supabase.instance.client.auth.updateUser(
         UserAttributes(password: newPassword),

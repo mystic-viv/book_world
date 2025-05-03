@@ -1,5 +1,5 @@
 name: book_world
-description: "A new Flutter project."
+description: "An app to read digital books and provide physical books on rent as well."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
@@ -46,6 +46,7 @@ dependencies:
   connectivity_plus: ^6.1.4
   shared_preferences: ^2.5.3
   image_picker: ^1.1.2
+  app_links: ^6.4.0
 
 dev_dependencies:
   flutter_test:
@@ -54,7 +55,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.3
 
 flutter_icons:
-  image_path: "assets/images/BWAppLogo.png"
+  image_path: "assets/icons/BW_APP_ICON.png"
   android: true
   ios: true
 

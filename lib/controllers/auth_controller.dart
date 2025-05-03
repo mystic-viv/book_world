@@ -239,12 +239,12 @@ class AuthController extends GetxController {
     }
 
     // Add this method to handle password reset confirmation
-    Future<void> confirmPasswordReset(String newPassword) async {
+    Future<void> confirmPasswordReset(String newPassword,String accessToken) async {
       try {
         confirmResetLoading.value = true;
       
         // Call the AuthService to update the password
-        await AuthService.confirmPasswordReset(newPassword);
+        await AuthService.confirmPasswordReset(newPassword, accessToken);
       
         confirmResetLoading.value = false;
       

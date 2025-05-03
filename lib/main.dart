@@ -9,6 +9,7 @@ import 'package:book_world/services/auth_service.dart';
 import 'package:book_world/services/storage_service.dart';
 import 'package:book_world/services/supabase_service.dart';
 import 'package:book_world/theme/theme.dart';
+import 'package:book_world/utils/deep_link_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -26,6 +27,9 @@ void main() async {
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
+
+  //Initialize deep link handler
+  initDeepLinkHandler();
 
   // Set up auth state change listener
   SupabaseService.client?.auth.onAuthStateChange.listen((data) {
@@ -61,7 +65,6 @@ void main() async {
   // Run the app
   runApp(const BookWorldApp());
 }
-
 
 class BookWorldApp extends StatelessWidget {
   const BookWorldApp({super.key});

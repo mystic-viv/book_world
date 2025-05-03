@@ -41,7 +41,7 @@ class Routes {
     ),
     GetPage(
       name: RouteNames.resetPasswordConfirm,
-      page: () => const ResetPasswordConfirm(),
+      page: () => const ResetPasswordConfirm(accessToken: ''),
     ),
     GetPage(name: RouteNames.signup1, page: () => const Signup1()),
     GetPage(name: RouteNames.signup2, page: () => const Signup2()),

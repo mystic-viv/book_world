@@ -1,22 +1,43 @@
 import 'dart:ui';
-import 'package:book_world/controllers/auth_controller.dart';
+import 'package:book_world/services/auth_service.dart'; // wherever you wrote confirmPasswordReset
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class ResetPasswordConfirm extends StatefulWidget {
-  const ResetPasswordConfirm({super.key});
+  const ResetPasswordConfirm({super.key, required String accessToken});
 
   @override
-  State<StatefulWidget> createState() => _ResetPasswordConfirmState();
+  State<ResetPasswordConfirm> createState() => _ResetPasswordConfirmState();
 }
 
 class _ResetPasswordConfirmState extends State<ResetPasswordConfirm> {
-  final AuthController _authController = Get.find<AuthController>();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  String? _accessToken; // Store access token here
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _extractAccessToken();
+  }
+
+  void _extractAccessToken() {
+    final uri = Uri.base;
+    final token = uri.queryParameters['access_token'];
+
+    if (token != null) {
+      setState(() {
+        _accessToken = token;
+      });
+    } else {
+      // No access token found, maybe show an error
+      print("No access token found in URL");
+    }
+  }
 
   @override
   void dispose() {
@@ -25,15 +46,51 @@ class _ResetPasswordConfirmState extends State<ResetPasswordConfirm> {
     super.dispose();
   }
 
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_accessToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No access token found. Please use the link from your email.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      setState(() => _loading = true);
+
+      await AuthService.confirmPasswordReset(
+        _passwordController.text,
+        _accessToken!,
+      );
+
+      setState(() => _loading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset successfully!')),
+      );
+
+      // Navigate to login page or home
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      setState(() => _loading = false);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error resetting password: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(
-        height: double.infinity,
-        width: double.infinity,
+      body: SizedBox.expand(
         child: Stack(
           children: [
-            // Background with blur effect
+            // Background blur
             SizedBox.expand(
               child: ImageFiltered(
                 imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
@@ -43,19 +100,14 @@ class _ResetPasswordConfirmState extends State<ResetPasswordConfirm> {
                 ),
               ),
             ),
-
-            // Dark overlay for better contrast
             Container(color: Colors.black.withAlpha(64)),
 
-            // Main content
             Center(
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // App logo or title
                       const Text(
                         "Book World",
                         style: TextStyle(
@@ -184,7 +236,8 @@ class _ResetPasswordConfirmState extends State<ResetPasswordConfirm> {
                                       ),
                                       onPressed: () {
                                         setState(() {
-                                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                                          _obscureConfirmPassword =
+                                              !_obscureConfirmPassword;
                                         });
                                       },
                                     ),
@@ -214,31 +267,23 @@ class _ResetPasswordConfirmState extends State<ResetPasswordConfirm> {
                                 ),
                                 const SizedBox(height: 30),
 
-                                // Submit button
+                                // Submit Button
                                 SizedBox(
                                   width: double.infinity,
                                   height: 45,
-                                  child: Obx(
-                                    () => ElevatedButton(
-                                      onPressed: _authController.confirmResetLoading.value
-                                          ? null
-                                          : () {
-                                              if (_formKey.currentState!.validate()) {
-                                                _authController.confirmPasswordReset(
-                                                  _passwordController.text,
-                                                );
-                                              }
-                                            },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        elevation: 3,
+                                  child: ElevatedButton(
+                                    onPressed: _loading ? null : _submit,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: _authController.confirmResetLoading.value
-                                          ? const SizedBox(
+                                      elevation: 3,
+                                    ),
+                                    child:
+                                        _loading
+                                            ? const SizedBox(
                                               width: 20,
                                               height: 20,
                                               child: CircularProgressIndicator(
@@ -246,14 +291,13 @@ class _ResetPasswordConfirmState extends State<ResetPasswordConfirm> {
                                                 strokeWidth: 2,
                                               ),
                                             )
-                                          : const Text(
+                                            : const Text(
                                               "Reset Password",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                    ),
                                   ),
                                 ),
                               ],
